@@ -12,7 +12,7 @@ const Home: NextPage = () => {
   const goToPage = (href: string) => router.push(href);
 
   return (
-    <div className="h-screen">
+    <div>
       <Head>
         <title>myGames</title>
         <meta name="description" content="My games" />
