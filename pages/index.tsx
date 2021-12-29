@@ -4,10 +4,12 @@ import Layout from '../components/Layout/Layout';
 import Image from 'next/image';
 import background from '../public/wallpaper.jpg';
 import Button from '../components/Button/Button';
+import { useRouter } from 'next/router';
 
 const Home: NextPage = () => {
+  const router = useRouter();
 
-  const goToAboutPage = () => console.log('test');
+  const goToPage = (href: string) => router.push(href);
 
   return (
     <div className="h-screen">
@@ -23,8 +25,8 @@ const Home: NextPage = () => {
             <p className="text-2xl text-center">Keep track of your library, what you&apos;re currently playing,
             where you&apos;re up to, and your backlog.</p>
             <div className="flex justify-center">
-              <Button onClick={goToAboutPage}>Learn more</Button>
-              <Button onClick={goToAboutPage}>Sign Up</Button>
+              <Button onClick={() => goToPage('/about')}>Learn more</Button>
+              <Button onClick={() => goToPage('/sign-up')}>Sign Up</Button>
             </div>
           </div>
         </div>
