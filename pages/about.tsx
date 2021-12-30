@@ -24,7 +24,8 @@ const About: NextPage = () => {
         </div>
         <div id="credits" className="pt-10">
           <h2 className="pt-4 text-2xl font-semibold">Acknowledgements</h2>
-          <p>The game data is fetched from the RAWG API (link here).</p>
+          <p>The game data you see throughout this site upon logging in comes from IGDB.</p>
+          <a href="https://igdb.com/" className="text-green-500 hover:underline">Click here to go to the IGDB website!</a>
         </div>
         <div className="flex justify-center items-center pt-20">
           <h2 className="text-2xl">Ready to start?</h2>
