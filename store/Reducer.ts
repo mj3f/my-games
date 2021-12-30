@@ -2,8 +2,12 @@ import { AppState } from "../models/app-state.interface";
 import { AuthState } from "../models/auth/auth-state.interface";
 import { User } from "../models/user/user.model";
 
+export type ReducerActionType = 
+    | 'LOG_IN'
+    | 'LOG_OUT'
+
 export interface ReducerAction {
-    type: string;
+    type: ReducerActionType;
     payload?: any;
 }
 
@@ -14,7 +18,6 @@ const Reducer = (state: AppState, action: ReducerAction) => {
                 ...state,
                 authState: action.payload as AuthState
             };
-            console.log('222222222222')
             return newState;
         default:
             return state;

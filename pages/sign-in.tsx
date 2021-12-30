@@ -1,17 +1,26 @@
 import { NextPage } from "next";
-import { useContext, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 import Button from "../components/Button/Button";
 import AppContext from "../context/AppContext";
+import { AuthState } from "../models/auth/auth-state.interface";
+import { User } from "../models/user/user.model";
 
 const SignIn: NextPage = () => {
     const [username, setUsername] = useState(''); // not ideal after each keystroke, refactor this.
     const [password, setPassword] = useState('');
-    const [appState, dispatch] = useContext(AppContext);
+    const [_, dispatch] = useContext(AppContext);
 
-    const handleSubmit = (e: Event) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
         console.log('Hello there!');
-        dispatch({ type: 'LOG_IN', payload: null});
+
+        const authState: AuthState = {
+            isAuthenticated: true,
+            currentUser: new User('Dummy user'),
+            token: 'dummy_token'
+        };
+
+        dispatch({ type: 'LOG_IN', payload: authState});
     };
     
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';
