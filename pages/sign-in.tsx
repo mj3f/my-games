@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { FormEvent, useContext, useState } from "react";
 import Button from "../components/Button/Button";
 import AppContext from "../context/AppContext";
@@ -9,6 +10,7 @@ const SignIn: NextPage = () => {
     const [username, setUsername] = useState(''); // not ideal after each keystroke, refactor this.
     const [password, setPassword] = useState('');
     const [_, dispatch] = useContext(AppContext);
+    const router = useRouter();
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
@@ -21,6 +23,7 @@ const SignIn: NextPage = () => {
         };
 
         dispatch({ type: 'LOG_IN', payload: authState});
+        router.push('/');
     };
     
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';

@@ -1,6 +1,5 @@
 import { AppState } from "../models/app-state.interface";
 import { AuthState } from "../models/auth/auth-state.interface";
-import { User } from "../models/user/user.model";
 
 export type ReducerActionType = 
     | 'LOG_IN'

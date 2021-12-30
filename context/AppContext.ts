@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch } from "react";
+import { createContext, Dispatch } from "react";
 import { AppState } from "../models/app-state.interface";
 import { AuthState } from "../models/auth/auth-state.interface";
 
