@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
 
 
     return (
-        <div className="flex w-full h-16 justify-between items-center bg-gray-900">
+        <div className="flex w-full h-16 justify-between items-center bg-gray-900 z-10">
             <h1 className="text-3xl font-semibold pl-2 text-green-500">myGames</h1>
             <div id="links-container" className="h-full px-2 flex items-center justify-end">
                 {showLoggedInNavLinks ? loggedInNavLinks : defaultNavLinks}
