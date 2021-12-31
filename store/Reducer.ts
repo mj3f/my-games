@@ -18,6 +18,15 @@ const Reducer = (state: AppState, action: ReducerAction) => {
                 authState: action.payload as AuthState
             };
             return newState;
+        case 'LOG_OUT':
+            return { // AppState
+                ...state,
+                authState: {
+                    isAuthenticated: false,
+                    currentUser: undefined,
+                    token: ''
+                }
+            }
         default:
             return state;
     }

@@ -3,18 +3,19 @@ import { useContext, useEffect, useState } from 'react';
 import AppContext from '../../../context/AppContext';
 
 interface NavbarLinkProps {
-    href: string;
     children: any;
+    href: string;
+    onClick?: () => void;
 }
 
-const NavbarLink: React.FC<NavbarLinkProps> = ({ href, children }) => (
+const NavbarLink: React.FC<NavbarLinkProps> = ({ href, children, onClick }) => (
     <Link href={href} passHref>
-        <a className="px-1 text-2xl font-semibold text-green-500 hover:text-white hover:cursor-pointer">{children}</a>
+        <a className="px-1 text-2xl font-semibold text-green-500 hover:text-white hover:cursor-pointer" onClick={onClick}>{children}</a>
     </Link>
 );
 
 const Navbar: React.FC = () => {
-    const [appState, _] = useContext(AppContext);
+    const [appState, dispatch] = useContext(AppContext);
     const [showLoggedInNavLinks, setShowLoggedInNavLinks] = useState(false);
 
 
@@ -33,7 +34,7 @@ const Navbar: React.FC = () => {
     const loggedInNavLinks = (
         <>
             <NavbarLink href='/'>Library</NavbarLink>
-            <NavbarLink href='/sign-out'>Sign Out</NavbarLink>
+            <NavbarLink onClick={() => dispatch({type: 'LOG_OUT'})} href='/'>Sign Out</NavbarLink>
         </>
     );
 
