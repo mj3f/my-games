@@ -7,12 +7,6 @@ const DefaultHome: React.FC = () => {
 
     const goToPage = (href: string) => router.push(href);
 
-    const particlesInit = (main: any) => {
-        console.log(main);
-    };
-
-    const particlesLoaded = (container: any) => console.log(container);
-
     const particleOptions: RecursivePartial<IOptions> = {
         fpsLimit: 60,
         interactivity: {
@@ -90,7 +84,7 @@ const DefaultHome: React.FC = () => {
 
     return (
         <div className="flex flex-col w-full px-32 h-full justify-center items-center bg-gray-800">
-            <Particles id="tsparticles" options={particleOptions} init={particlesInit} loaded={particlesLoaded} />
+            <Particles id="tsparticles" options={particleOptions} />
             <div className="z-10 text-green-500">
                 <h1 className="text-4xl font-semibold text-center">Your Games, Your Time</h1>
                 <p className="text-2xl text-center">Keep track of your library, what you&apos;re currently playing,
