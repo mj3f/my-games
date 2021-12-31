@@ -1,25 +1,43 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
+import { GetStaticProps } from "next";
 import { useContext, useEffect } from "react";
 import AppContext from "../../context/AppContext";
+import { TwitchLogin } from "../../models/igdb/twitch-login.interface";
 import secrets from "../../secrets.json";
+
 
 // Logged in user home page.
 const UserHome: React.FC = () => { // TODO: types in props.
     const [appState, _] = useContext(AppContext);
 
     useEffect(() => {
-        console.log('user home mounted!!!!');
-        async function authWithTwitch() {
-            // TODO: Can this be done in getStaticProps?
-            console.log('sectets = ', secrets.clientId);
-            axios.post(`https://id.twitch.tv/oauth2/token?client_id=${secrets.clientId}&client_secret=${secrets.clientSecret}&grant_type=client_credentials`)
-                .then((res) => console.log(res))
-                .catch(err => console.error(err));
+        const getData = async () => {
+            let twitchLogin: TwitchLogin = {
+                access_token: '',
+                expires_in: 0,
+                token_type: ''
+            };
+        
+            await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${secrets.clientId}&client_secret=${secrets.clientSecret}&grant_type=client_credentials`)
+                        .then((res) => twitchLogin = res.data)
+                        .catch(err => console.error(err));
 
-                // example request: https://api.igdb.com/v4/games/85031?fields=name,cover,genres,platforms
-                // see docs: https://api-docs.igdb.com/#game
-        }
-        authWithTwitch();
+            const config: AxiosRequestConfig = {
+                headers: {
+                    'Client-ID': secrets.clientId,
+                    'Authorization': 'Bearer ' + twitchLogin.access_token
+                }
+            };
+
+            axios.get('https://api.igdb.com/v4/games/85031?fields=name,cover,genres,platforms', config)
+                .then(res => console.log(res))
+                .catch(err => console.error(err));
+        };
+
+        getData();
+
+        // example request: https://api.igdb.com/v4/games/85031?fields=name,cover,genres,platforms
+        // see docs: https://api-docs.igdb.com/#game
     }, []);
 
     return (
@@ -36,11 +54,5 @@ const UserHome: React.FC = () => { // TODO: types in props.
         </div>
     );
 };
-
-interface TwitchLogin {
-    access_token: string;
-    expires_in: number;
-    token_type: string;
-}
 
 export default UserHome;
