@@ -14,7 +14,6 @@ const SignIn: NextPage = () => {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
-        console.log('Hello there!');
 
         const authState: AuthState = {
             isAuthenticated: true,
@@ -27,6 +26,7 @@ const SignIn: NextPage = () => {
     };
     
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';
+    
     return (
         <div className="flex justify-center items-center h-screen w-full bg-gray-800">
             <div id="form-container" className="flex flex-col justify-start rounded w-1/2 bg-gray-200">
