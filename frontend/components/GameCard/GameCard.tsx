@@ -1,5 +1,5 @@
 import Image from "next/image";
-import massEffectWallpaper from "../../public/mass-effect-wallpaper.jpg";
+import massEffectWallpaper from "../../public/mass-effect-background.png";
 
 const GameCard: React.FC = () => {
     return (
