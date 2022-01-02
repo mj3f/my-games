@@ -8,8 +8,8 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class TwitchLoginService {
     public twitchLoginData: TwitchLogin;
+    public readonly clientId: string;
     private readonly logger = new Logger(TwitchLoginService.name);
-    private readonly clientId: string;
     private readonly clientSecret: string;
 
     public constructor(
