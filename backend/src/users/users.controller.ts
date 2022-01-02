@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpCode, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { AddGameDto } from './dtos/add-game-dto.model';
 import { UserDto } from './dtos/user-dto.model';
 import { UserWithPasswordDto } from './dtos/user-with-password-dto.model';
 import { User } from './schemas/user.schema';
@@ -32,5 +33,12 @@ export class UsersController {
         }
 
         return user;
+    }
+
+    @Put(':id/add-game')
+    @HttpCode(200)
+    public async addGameToUsersLibrary(@Param('id') id: string, @Body() addGame: AddGameDto): Promise<string> {
+        await this.usersService.addGameToUsersLibrary(addGame);
+        return 'game added, (I think?)';
     }
 }
