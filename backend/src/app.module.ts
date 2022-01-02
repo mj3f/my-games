@@ -6,9 +6,11 @@ import { GamesModule } from './games/games.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
-import { BackgroundTasksService } from './background-tasks/background-tasks.service';
+import { HttpModule } from '@nestjs/axios';
+import { TwitchLoginService } from './twitch-login/twitch-login.service';
+import secrets from '../secrets.json';
 
-const mongoPassword = '';
+const mongoPassword = secrets.mongodb.password;
 
 @Module({
   imports: [
@@ -16,9 +18,10 @@ const mongoPassword = '';
     UsersModule,
     GamesModule,
     AuthModule,
+    HttpModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService, BackgroundTasksService],
+  providers: [AppService, TwitchLoginService],
 })
 export class AppModule {}
