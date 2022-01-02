@@ -29,8 +29,6 @@ export class TwitchLoginService {
         );
 
         this.twitchLoginData = data as TwitchLogin;
-
-        // this.logger.debug(JSON.stringify(data));
         
         this.logger.debug('Logged into twitch, token expires in ' + this.twitchLoginData.expires_in);
     }

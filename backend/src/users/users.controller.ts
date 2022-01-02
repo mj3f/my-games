@@ -4,7 +4,7 @@ import { UserWithPasswordDto } from './dtos/user-with-password-dto.model';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
 
-@Controller('users')
+@Controller('api/v0/users')
 export class UsersController {
 
     public constructor(private usersService: UsersService) {}
