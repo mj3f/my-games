@@ -8,10 +8,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HttpModule } from '@nestjs/axios';
 import { TwitchLoginService } from './twitch-login/twitch-login.service';
-import secrets from '../secrets.json';
 import { ConfigModule } from '@nestjs/config';
 
-const mongoPassword = secrets.mongodb.password;
+const mongoPassword = 'How to get this from configService in app module??';
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ const mongoPassword = secrets.mongodb.password;
     AuthModule,
     HttpModule,
     ScheduleModule.forRoot(),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ envFilePath: '.env.local', isGlobal: true }),
   ],
   controllers: [AppController],
   providers: [AppService, TwitchLoginService],
