@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { HttpModule } from '@nestjs/axios';
 import { TwitchLoginService } from './twitch-login/twitch-login.service';
 import secrets from '../secrets.json';
+import { ConfigModule } from '@nestjs/config';
 
 const mongoPassword = secrets.mongodb.password;
 
@@ -20,6 +21,7 @@ const mongoPassword = secrets.mongodb.password;
     AuthModule,
     HttpModule,
     ScheduleModule.forRoot(),
+    ConfigModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService, TwitchLoginService],
