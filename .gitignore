@@ -261,6 +261,8 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+.idea/.idea.MyGames/*
+.idea.MyGames/*
 
 # CodeRush
 .cr/
@@ -275,3 +277,6 @@ __pycache__/
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore
 appsettings.Development.json
 src/MyGames/MyGames.API/appsettings.Development.json
+
+
+src/MyGames/MyGames.Frontend/.next/*
