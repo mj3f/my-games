@@ -1,8 +1,16 @@
+using MyGames.API.HostedServices;
 using MyGames.Core.AppSettings;
 using MyGames.Core.Services;
-using MyGames.Database;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 
@@ -20,21 +28,46 @@ builder.Services.Configure<TwitchLoginSettings>(builder.Configuration.GetSection
 // - Singletons
 builder.Services.AddSingleton<UsersService>();
 builder.Services.AddSingleton<TwitchLoginService>();
+builder.Services.AddSingleton<GamesService>();
 
+// Register http clients
+builder.Services.AddHttpClient<GamesService>();
+builder.Services.AddHttpClient<TwitchLoginService>();
+
+builder.Services.AddHostedService<BackgroundJobService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    Log.Information("Starting up");
+    
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    // app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.UseSerilogRequestLogging();
+
+    app.MapControllers();
+
+    app.Run();
+
+    return 0;
 }
+catch (Exception ex)
+{
+    Log.Fatal(ex.Message);
 
-// app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+    return 1;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
