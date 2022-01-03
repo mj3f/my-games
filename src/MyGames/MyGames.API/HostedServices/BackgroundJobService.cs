@@ -18,7 +18,7 @@ public class BackgroundJobService : IHostedService
     public Task StartAsync(CancellationToken cancellationToken)
     {
         Logger.Information("[BackgroundService] Starting background tasks....");
-        _timer = new Timer(async _ => await Login(), null, TimeSpan.Zero, TimeSpan.FromSeconds(20));
+        _timer = new Timer(async _ => await Login(), null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
 
         return Task.CompletedTask;
     }

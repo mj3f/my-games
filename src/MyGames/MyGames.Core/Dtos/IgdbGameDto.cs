@@ -10,7 +10,7 @@ public sealed class IgdbGameDto
     /// <summary>
     /// Id of games cover art.
     /// </summary>
-    public string Cover { get; set; }
+    public int Cover { get; set; }
     
     /// <summary>
     /// List of genres the game belongs to.

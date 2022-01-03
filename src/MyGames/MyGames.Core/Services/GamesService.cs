@@ -18,25 +18,31 @@ public sealed class GamesService
     private readonly HttpClient _httpClient;
 
     private const string IgdbApiEndpoint = "https://api.igdb.com/v4/games/";
+
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
     
     public GamesService(IMemoryCache cache, HttpClient httpClient)
     {
         _memoryCache = cache;
         _httpClient = httpClient;
+        _jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     }
 
-    public async Task<GameDto> GetGame(string id)
+    public async Task<List<IgdbGameDto>?> GetGames()
     {
-        TwitchLoginCredentials? loginCredentials = _memoryCache.Get("TwitchLoginCredentials") as TwitchLoginCredentials;
-        string? clientId = _memoryCache.Get("ClientId") as string;
-        
-        if (loginCredentials is null || string.IsNullOrEmpty(clientId))
-        {
-            return null;
-        }
+        SetHeaders();
+        HttpResponseMessage response =
+            await _httpClient.GetAsync(IgdbApiEndpoint + $"?fields=name,cover,genres,platforms");
 
-        _httpClient.DefaultRequestHeaders.Add("Client-ID", clientId);
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {loginCredentials.AccessToken}");
+        response.EnsureSuccessStatusCode();
+        
+        string responseBody = await response.Content.ReadAsStringAsync();
+        return DeserializeResponseToListOfGames(responseBody);
+    }
+
+    public async Task<IgdbGameDto?> GetGame(string id)
+    {
+        SetHeaders();
 
         HttpResponseMessage response =
             await _httpClient.GetAsync(IgdbApiEndpoint + $"{id}?fields=name,cover,genres,platforms");
@@ -44,16 +50,27 @@ public sealed class GamesService
         response.EnsureSuccessStatusCode();
         
         string responseBody = await response.Content.ReadAsStringAsync();
+        return DeserializeResponseToListOfGames(responseBody)?.FirstOrDefault();
+    }
+
+    private List<IgdbGameDto>? DeserializeResponseToListOfGames(string responseBody)
+    {
         if (!string.IsNullOrEmpty(responseBody))
         {
-            IgdbGameDto? igdbGame = JsonSerializer.Deserialize<IgdbGameDto>(responseBody);
-            Console.WriteLine("what now?");
-            
+            List<IgdbGameDto>? igdbGames = JsonSerializer.Deserialize<List<IgdbGameDto>>(responseBody, _jsonSerializerOptions);
+            return igdbGames;
         }
 
         return null;
-
     }
-    
-    
+
+    private void SetHeaders()
+    {
+        TwitchLoginCredentials? loginCredentials = _memoryCache.Get("TwitchLoginCredentials") as TwitchLoginCredentials;
+        string? clientId = _memoryCache.Get("ClientId") as string;
+        
+        _httpClient.DefaultRequestHeaders.Add("Client-ID", clientId);
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {loginCredentials?.AccessToken}");
+    }
+
 }
