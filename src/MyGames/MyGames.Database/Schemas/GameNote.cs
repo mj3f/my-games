@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace MyGames.Database.Schemas;
 
+[BsonIgnoreExtraElements]
 public class GameNote
 {
     [BsonId]

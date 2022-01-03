@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace MyGames.Database.Schemas;
 
+[BsonIgnoreExtraElements]
 public class Game
 {
     [BsonId]
@@ -13,12 +14,11 @@ public class Game
     public string Name { get; set; } = null!;
 
     [BsonElement("igdbId")]
-    public string IgdbId { get; set; } = null!;
+    public int IgdbId { get; set; }
     
     [BsonElement("status")]
     public string Status { get; set; }
     
-    [BsonRepresentation(BsonType.Array)]
     [BsonElement("notes")]
     public ICollection<GameNote> Notes { get; set; }
 }

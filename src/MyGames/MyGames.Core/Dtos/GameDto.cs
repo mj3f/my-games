@@ -10,7 +10,7 @@ public sealed class GameDto
     /// <summary>
     /// The games unique identifier in the internet games database.
     /// </summary>
-    public string IgdbId { get; set; }
+    public int IgdbId { get; set; }
     
     /// <summary>
     /// The name of the game.

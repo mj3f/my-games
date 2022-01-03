@@ -25,18 +25,33 @@ public sealed class UsersService
     public async Task<List<UserDto>> GetUsers()
     {
         var list = await _usersCollection.Find(_ => true).ToListAsync();
+        if (list is null || list.Count == 0)
+        {
+            return new List<UserDto>();
+        }
+        
         return list.Select(ConvertUserToUserDto).ToList();
     }
 
     public async Task<UserDto?> GetById(string id)
     {
         var user = await _usersCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            return null;
+        }
+        
         return ConvertUserToUserDto(user);
     }
 
     public async Task<UserDto?> GetByUsername(string username)
     {
         var user = await _usersCollection.Find(u => u.Username == username).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            return null;
+        }
+        
         return ConvertUserToUserDto(user);
     }
 
