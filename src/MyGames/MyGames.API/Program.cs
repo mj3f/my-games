@@ -1,3 +1,4 @@
+using MyGames.Core.AppSettings;
 using MyGames.Core.Services;
 using MyGames.Database;
 
@@ -10,12 +11,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Map appSettings kvp to C# classes.
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDB"));
+builder.Services.Configure<TwitchLoginSettings>(builder.Configuration.GetSection("TwitchLogin"));
 
 // Register services
 
-// Singletons
+// - Singletons
 builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<TwitchLoginService>();
 
 
 var app = builder.Build();

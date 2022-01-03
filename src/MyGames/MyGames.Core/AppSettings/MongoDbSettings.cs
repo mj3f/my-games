@@ -1,4 +1,4 @@
-﻿namespace MyGames.Database;
+﻿namespace MyGames.Core.AppSettings;
 
 public sealed class MongoDbSettings
 {

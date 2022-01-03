@@ -2,6 +2,7 @@ using MongoDB.Driver;
 using MyGames.Database;
 using MyGames.Database.Schemas;
 using Microsoft.Extensions.Options;
+using MyGames.Core.AppSettings;
 using MyGames.Core.Dtos;
 
 namespace MyGames.Core.Services;
