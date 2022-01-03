@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using MyGames.Core.Services;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -33,9 +34,5 @@ public class BackgroundJobService : IHostedService
     private async Task Login()
     {
         await _twitchLoginService.Login();
-        if (_twitchLoginService.TwitchLoginCredentials is not null)
-        {
-            Logger.Information("[BackgroundService] Logged into Twitch, token expires at " + _twitchLoginService.TwitchLoginCredentials.ExpiresIn);
-        }
     }
 }

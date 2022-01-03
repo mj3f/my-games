@@ -1,5 +1,8 @@
+using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using MyGames.Core.Dtos;
 using MyGames.Core.Models;
+using Serilog;
 
 namespace MyGames.Core.Services;
 
@@ -9,27 +12,30 @@ namespace MyGames.Core.Services;
 /// </summary>
 public sealed class GamesService
 {
-    private readonly TwitchLoginService _twitchLoginService;
+    private static readonly ILogger Logger = Log.ForContext<GamesService>();
+
+    private readonly IMemoryCache _memoryCache;
     private readonly HttpClient _httpClient;
 
     private const string IgdbApiEndpoint = "https://api.igdb.com/v4/games/";
     
-    public GamesService(TwitchLoginService twitchLoginService, HttpClient httpClient)
+    public GamesService(IMemoryCache cache, HttpClient httpClient)
     {
-        _twitchLoginService = twitchLoginService;
+        _memoryCache = cache;
         _httpClient = httpClient;
     }
 
     public async Task<GameDto> GetGame(string id)
     {
-        TwitchLoginCredentials? loginCredentials = _twitchLoginService.TwitchLoginCredentials;
+        TwitchLoginCredentials? loginCredentials = _memoryCache.Get("TwitchLoginCredentials") as TwitchLoginCredentials;
+        string? clientId = _memoryCache.Get("ClientId") as string;
         
-        if (loginCredentials is null)
+        if (loginCredentials is null || string.IsNullOrEmpty(clientId))
         {
-            _twitchLoginService.Login();
+            return null;
         }
-        
-        _httpClient.DefaultRequestHeaders.Add("Client-ID", _twitchLoginService.ClientId);
+
+        _httpClient.DefaultRequestHeaders.Add("Client-ID", clientId);
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {loginCredentials.AccessToken}");
 
         HttpResponseMessage response =
@@ -40,7 +46,9 @@ public sealed class GamesService
         string responseBody = await response.Content.ReadAsStringAsync();
         if (!string.IsNullOrEmpty(responseBody))
         {
-            // TwitchLoginCredentials = JsonSerializer.Deserialize<TwitchLoginCredentials>(responseBody);
+            IgdbGameDto? igdbGame = JsonSerializer.Deserialize<IgdbGameDto>(responseBody);
+            Console.WriteLine("what now?");
+            
         }
 
         return null;

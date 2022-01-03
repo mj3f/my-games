@@ -24,6 +24,7 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Mo
 builder.Services.Configure<TwitchLoginSettings>(builder.Configuration.GetSection("TwitchLogin"));
 
 // Register services
+builder.Services.AddMemoryCache();
 
 // - Singletons
 builder.Services.AddSingleton<UsersService>();
