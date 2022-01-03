@@ -15,7 +15,7 @@ public sealed class IgdbGameDto
     /// <summary>
     /// List of genres the game belongs to.
     /// </summary>
-    public List<int> Genres { get; set; }
+    public List<int>? Genres { get; set; }
     
     /// <summary>
     /// The name of the game.
@@ -25,5 +25,5 @@ public sealed class IgdbGameDto
     /// <summary>
     /// List of platforms the game can be played on.
     /// </summary>
-    public List<int> Platforms { get; set; }
+    public List<int>? Platforms { get; set; }
 }

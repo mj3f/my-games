@@ -9,14 +9,11 @@ namespace MyGames.Core.Services;
 
 public sealed class TwitchLoginService
 {
-    public string _clientId { get; }
-    
-    private readonly string _clientSecret;
-    private readonly HttpClient _httpClient;
     private static readonly ILogger Logger = Log.ForContext<TwitchLoginService>();
     
-    public string UUID { get; } = Guid.NewGuid().ToString();
-
+    private readonly string _clientId;
+    private readonly string _clientSecret;
+    private readonly HttpClient _httpClient;
     private readonly IMemoryCache _memoryCache;
 
     public TwitchLoginService(IOptions<TwitchLoginSettings> loginSettings, HttpClient httpClient, IMemoryCache cache)

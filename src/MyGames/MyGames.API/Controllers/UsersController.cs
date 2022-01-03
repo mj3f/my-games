@@ -56,8 +56,34 @@ public sealed class UsersController : ControllerBase
     [ProducesResponseType(404)]
     [ProducesResponseType(400)]
     [Description("Adds a game to a users library.")]
-    public async Task<IActionResult> CreateAsync(string username, [FromBody] GameDto game)
+    public async Task<IActionResult> AddGameToUserLibraryAsync(string username, [FromBody] IgdbGameDto game)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _usersService.AddGameToUsersLibrary(username, game);
+            return Ok("game added to users library");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [HttpPut("{username}/remove-game")]
+    [ProducesResponseType( 200)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(400)]
+    [Description("Removes a game from a users library.")]
+    public async Task<IActionResult> RemoveGameFromUserLibraryAsync(string username, [FromQuery] string gameId)
+    {
+        try
+        {
+            await _usersService.RemoveGameFromUsersLibrary(username, gameId);
+            return Ok("game removed from users library");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
