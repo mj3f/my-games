@@ -1,3 +1,4 @@
+import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FormEvent, useContext, useState } from "react";
@@ -12,12 +13,17 @@ const SignIn: NextPage = () => {
     const [_, dispatch] = useContext(AppContext);
     const router = useRouter();
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
+
+        let user: User = null!;
+        await axios.get('http://localhost:5109/api/v0/users/dummy')
+            .then(res => user = res.data)
+            .catch(err => console.error(err));
 
         const authState: AuthState = {
             isAuthenticated: true,
-            currentUser: new User('Dummy user'),
+            currentUser: user,
             token: 'dummy_token'
         };
 
