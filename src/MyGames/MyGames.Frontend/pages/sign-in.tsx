@@ -16,19 +16,23 @@ const SignIn: NextPage = () => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
 
-        let user: User = null!;
         await axios.get('http://localhost:5109/api/v0/users/dummy')
-            .then(res => user = res.data)
+            .then(res => {
+                let user: User = res.data;
+
+                const authState: AuthState = {
+                    isAuthenticated: true,
+                    currentUser: user,
+                    token: 'dummy_token'
+                };
+        
+                dispatch({ type: 'LOG_IN', payload: authState});
+                router.push('/');
+            })
             .catch(err => console.error(err));
 
-        const authState: AuthState = {
-            isAuthenticated: true,
-            currentUser: user,
-            token: 'dummy_token'
-        };
-
-        dispatch({ type: 'LOG_IN', payload: authState});
-        router.push('/');
+            // TODO: Handle errors when username/password inputs don't match any db entries.
+       
     };
     
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';

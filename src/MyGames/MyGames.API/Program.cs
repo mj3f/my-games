@@ -25,6 +25,7 @@ builder.Services.Configure<TwitchLoginSettings>(builder.Configuration.GetSection
 
 // Register services
 builder.Services.AddMemoryCache();
+builder.Services.AddCors();
 
 // - Singletons
 builder.Services.AddSingleton<UsersService>();
@@ -51,6 +52,12 @@ try
     }
 
     // app.UseHttpsRedirection();
+    
+    app.UseCors(b => b
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .WithOrigins("http://localhost:3000")
+        .AllowCredentials());
 
     app.UseAuthorization();
 
