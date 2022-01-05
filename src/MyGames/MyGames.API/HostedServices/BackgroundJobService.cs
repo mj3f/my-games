@@ -18,6 +18,8 @@ public class BackgroundJobService : IHostedService
     public Task StartAsync(CancellationToken cancellationToken)
     {
         Logger.Information("[BackgroundService] Starting background tasks....");
+        
+        // Get twitch login token every 20 mintutes in order to be able to keep making valid API requests to IGDB.
         _timer = new Timer(async _ => await Login(), null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
 
         return Task.CompletedTask;

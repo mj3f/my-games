@@ -7,6 +7,9 @@ using Serilog;
 
 namespace MyGames.Core.Services;
 
+/// <summary>
+/// Service to authenticate with Twitch/IGDB API prior to making requests.
+/// </summary>
 public sealed class TwitchLoginService
 {
     private static readonly ILogger Logger = Log.ForContext<TwitchLoginService>();
@@ -16,6 +19,7 @@ public sealed class TwitchLoginService
     private readonly HttpClient _httpClient;
     private readonly IMemoryCache _memoryCache;
 
+    // loginSettings values populated from appSettings.json in API project.
     public TwitchLoginService(IOptions<TwitchLoginSettings> loginSettings, HttpClient httpClient, IMemoryCache cache)
     {
         _clientId = loginSettings.Value.ClientId;
@@ -24,9 +28,13 @@ public sealed class TwitchLoginService
         _httpClient = httpClient;
         _memoryCache = cache;
 
-        _memoryCache.Set("ClientId", _clientId);
+        _memoryCache.Set("ClientId", _clientId); // Globally cache client id so it can be accessed elsewhere.
     }
 
+    /// <summary>
+    /// Authenticate with the Twitch developer API in order to make API requests to IGDB to get game data etc.
+    /// This method is called periodically inside a background service to refresh the bearer token.
+    /// </summary>
     public async Task Login()
     {
         try

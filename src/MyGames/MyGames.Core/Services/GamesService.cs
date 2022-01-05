@@ -13,12 +13,10 @@ namespace MyGames.Core.Services;
 public sealed class GamesService
 {
     private static readonly ILogger Logger = Log.ForContext<GamesService>();
-
+    private const string IgdbApiEndpoint = "https://api.igdb.com/v4/games/";
+    
     private readonly IMemoryCache _memoryCache;
     private readonly HttpClient _httpClient;
-
-    private const string IgdbApiEndpoint = "https://api.igdb.com/v4/games/";
-
     private readonly JsonSerializerOptions _jsonSerializerOptions;
     
     public GamesService(IMemoryCache cache, HttpClient httpClient)
@@ -28,9 +26,14 @@ public sealed class GamesService
         _jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     }
 
+    /// <summary>
+    /// Get a collection of games from the IGDB API.
+    /// </summary>
+    /// <returns>A list of <see cref="IgdbGameDto"/></returns>
     public async Task<List<IgdbGameDto>?> GetGames()
     {
         SetHeaders();
+        
         HttpResponseMessage response =
             await _httpClient.GetAsync(IgdbApiEndpoint + $"?fields=name,cover,genres,platforms");
 
@@ -40,8 +43,19 @@ public sealed class GamesService
         return DeserializeResponseToListOfGames(responseBody);
     }
 
+    /// <summary>
+    /// Get a game from the IGDB API based on a unique identifier.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>A <see cref="IgdbGameDto"/></returns>
     public async Task<IgdbGameDto?> GetGame(string id)
     {
+
+        if (string.IsNullOrEmpty(id))
+        {
+            return null;
+        }
+        
         SetHeaders();
 
         HttpResponseMessage response =
@@ -53,6 +67,12 @@ public sealed class GamesService
         return DeserializeResponseToListOfGames(responseBody)?.FirstOrDefault();
     }
 
+    /// <summary>
+    /// Takes the json string response from the IGDB API, and deserializes it to a list of type IgdbGameDto.
+    /// If no games returned, this method will return null to the controller endpoint.
+    /// </summary>
+    /// <param name="responseBody"></param>
+    /// <returns>A list of <see cref="IgdbGameDto"/></returns>
     private List<IgdbGameDto>? DeserializeResponseToListOfGames(string responseBody)
     {
         if (!string.IsNullOrEmpty(responseBody))
@@ -64,6 +84,10 @@ public sealed class GamesService
         return null;
     }
 
+    /// <summary>
+    /// Sets two custom Http requesst headers that required for making requests to the IGDB API.
+    /// Client-ID, which is the id of the registered Twitch developer account, and a Bearer authorization token.
+    /// </summary>
     private void SetHeaders()
     {
         TwitchLoginCredentials? loginCredentials = _memoryCache.Get("TwitchLoginCredentials") as TwitchLoginCredentials;
