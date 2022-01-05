@@ -107,6 +107,7 @@ public sealed class UsersService
             Id = GuidGenerator.GenerateGuidForMongoDb(),
             IgdbId = gameToAdd.Id,
             Name = gameToAdd.Name,
+            CoverArtUrl = gameToAdd.CoverArtUrl,
             Notes = new List<GameNote>(),
             Status = GameStatus.Backlog
         };

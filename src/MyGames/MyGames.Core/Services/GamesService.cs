@@ -1,5 +1,9 @@
 using System.Text.Json;
+using IGDB;
+using IGDB.Models;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using MyGames.Core.AppSettings;
 using MyGames.Core.Dtos;
 using MyGames.Core.Models;
 using Serilog;
@@ -13,17 +17,18 @@ namespace MyGames.Core.Services;
 public sealed class GamesService
 {
     private static readonly ILogger Logger = Log.ForContext<GamesService>();
-    private const string IgdbApiEndpoint = "https://api.igdb.com/v4/games/";
+    private const string IgdbApiEndpoint = "https://api.igdb.com/v4/";
     
-    private readonly IMemoryCache _memoryCache;
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
+
+    private readonly IGDBClient _client;
     
-    public GamesService(IMemoryCache cache, HttpClient httpClient)
+    public GamesService(IOptions<TwitchLoginSettings> loginSettings, HttpClient httpClient)
     {
-        _memoryCache = cache;
         _httpClient = httpClient;
         _jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        _client = CreateIGDBClient(loginSettings.Value.ClientId, loginSettings.Value.ClientSecret);
     }
 
     /// <summary>
@@ -32,69 +37,76 @@ public sealed class GamesService
     /// <returns>A list of <see cref="IgdbGameDto"/></returns>
     public async Task<List<IgdbGameDto>?> GetGames()
     {
-        SetHeaders();
-        
-        HttpResponseMessage response =
-            await _httpClient.GetAsync(IgdbApiEndpoint + $"?fields=name,cover,genres,platforms");
+        var games = await _client.QueryAsync<Game>(IGDBClient.Endpoints.Games, query: "fields id,name,cover,genres.name,platforms.name,artworks.image_id;;");
 
-        response.EnsureSuccessStatusCode();
-        
-        string responseBody = await response.Content.ReadAsStringAsync();
-        return DeserializeResponseToListOfGames(responseBody);
+        if (games is null)
+        {
+            return null;
+        }
+
+        var gamesList = new List<IgdbGameDto>();
+        foreach (var game in games)
+        {
+            string? artworkImageId = game.Artworks?.Values.FirstOrDefault()?.ImageId;
+            string coverUrl = !string.IsNullOrEmpty(artworkImageId)
+                ? IGDB.ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false)
+                : string.Empty;
+            
+            gamesList.Add(new IgdbGameDto
+            {
+                Id = game.Id,
+                Name = game.Name,
+                Genres = game.Genres?.Values.Select(genre => genre.Name).ToList(),
+                Platforms = game.Platforms?.Values.Select(platform => platform.Name).ToList(),
+                CoverArtUrl = coverUrl
+            });
+        }
+
+        return gamesList;
     }
 
     /// <summary>
     /// Get a game from the IGDB API based on a unique identifier.
     /// </summary>
     /// <param name="id"></param>
-    /// <returns>A <see cref="IgdbGameDto"/></returns>
-    public async Task<IgdbGameDto?> GetGame(string id)
+    /// <returns>A <see cref="Game"/></returns>
+    public async Task<IgdbGameDto?> GetGame(int id)
     {
-
-        if (string.IsNullOrEmpty(id))
-        {
-            return null;
-        }
+        var games = await _client.QueryAsync<Game>(IGDBClient.Endpoints.Games, query: $"fields id,name,cover,genres.name,platforms.name,artworks.image_id; where id={id};");
+        var game = games.FirstOrDefault();
         
-        SetHeaders();
-
-        HttpResponseMessage response =
-            await _httpClient.GetAsync(IgdbApiEndpoint + $"{id}?fields=name,cover,genres,platforms");
-
-        response.EnsureSuccessStatusCode();
-        
-        string responseBody = await response.Content.ReadAsStringAsync();
-        return DeserializeResponseToListOfGames(responseBody)?.FirstOrDefault();
-    }
-
-    /// <summary>
-    /// Takes the json string response from the IGDB API, and deserializes it to a list of type IgdbGameDto.
-    /// If no games returned, this method will return null to the controller endpoint.
-    /// </summary>
-    /// <param name="responseBody"></param>
-    /// <returns>A list of <see cref="IgdbGameDto"/></returns>
-    private List<IgdbGameDto>? DeserializeResponseToListOfGames(string responseBody)
-    {
-        if (!string.IsNullOrEmpty(responseBody))
+        if (game is not null)
         {
-            List<IgdbGameDto>? igdbGames = JsonSerializer.Deserialize<List<IgdbGameDto>>(responseBody, _jsonSerializerOptions);
-            return igdbGames;
+            var artworkImageId = game.Artworks?.Values.FirstOrDefault()?.ImageId;
+            string coverUrl = IGDB.ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false);
+            
+            return new IgdbGameDto
+            {
+                Id = game.Id,
+                Name = game.Name,
+                Genres = game.Genres?.Values.Select(genre => genre.Name).ToList(),
+                Platforms = game.Platforms?.Values.Select(platform => platform.Name).ToList(),
+                CoverArtUrl = coverUrl
+            };
         }
 
         return null;
+        // var games2 = await _client.QueryAsync<Game>(IGDB.IGDBClient.Endpoints.Games, query: "fields artworks.image_id; where id = 4;");
+
     }
 
     /// <summary>
-    /// Sets two custom Http requesst headers that required for making requests to the IGDB API.
-    /// Client-ID, which is the id of the registered Twitch developer account, and a Bearer authorization token.
+    /// Returns a new instance of an IGDB Client.
     /// </summary>
-    private void SetHeaders()
+    /// <param name="clientId"></param>
+    /// <param name="clientSecret"></param>
+    /// <returns></returns>
+    private IGDBClient CreateIGDBClient(string clientId, string clientSecret)
     {
-        TwitchLoginCredentials? loginCredentials = _memoryCache.Get("TwitchLoginCredentials") as TwitchLoginCredentials;
-        string? clientId = _memoryCache.Get("ClientId") as string;
-        
-        _httpClient.DefaultRequestHeaders.Add("Client-ID", clientId);
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {loginCredentials?.AccessToken}");
+        return new IGDBClient(
+            clientId,
+            clientSecret
+        );
     }
 
 }

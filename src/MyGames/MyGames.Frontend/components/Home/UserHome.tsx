@@ -20,6 +20,10 @@ const UserHome: React.FC = () => { // TODO: types in props.
     },
     [appState]);
 
+    if (!user) {
+        return null;
+    }
+
     return (
         <div className="px-2 flex flex-col justify-start">
             <p className="text-4xl font-semibold">{user?.username}&apos;s Library</p>

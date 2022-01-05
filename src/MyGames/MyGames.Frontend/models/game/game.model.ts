@@ -6,5 +6,6 @@ export class Game {
         public igdbId: number,
         public name: string,
         public gameStatus: string,
-        public notes: GameNote[]) {}
+        public notes: GameNote[],
+        public coverArtUrl?: string) {}
 }

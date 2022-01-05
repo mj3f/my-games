@@ -14,7 +14,10 @@ public class Game
     public string Name { get; set; } = null!;
 
     [BsonElement("igdbId")]
-    public int IgdbId { get; set; }
+    public long? IgdbId { get; set; }
+    
+    [BsonElement("coverArtUrl")]
+    public string? CoverArtUrl { get; set; }
     
     [BsonElement("status")]
     public string Status { get; set; }

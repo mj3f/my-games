@@ -10,12 +10,17 @@ public sealed class GameDto
     /// <summary>
     /// The games unique identifier in the internet games database.
     /// </summary>
-    public int IgdbId { get; set; }
+    public long? IgdbId { get; set; }
     
     /// <summary>
     /// The name of the game.
     /// </summary>
     public string Name { get; set; }
+    
+    /// <summary>
+    /// The games cover art as a url (if it exists).
+    /// </summary>
+    public string? CoverArtUrl { get; set; }
 
     /// <summary>
     /// Status of the game in the users library.

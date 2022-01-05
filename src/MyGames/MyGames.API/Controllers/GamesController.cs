@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using IGDB.Models;
 using Microsoft.AspNetCore.Mvc;
 using MyGames.Core.Dtos;
 using MyGames.Core.Services;
@@ -41,7 +42,7 @@ public sealed class GamesController : ControllerBase
     [ProducesResponseType(typeof(IgdbGameDto), 200)]
     [ProducesResponseType(404)]
     [Description("Returns a game entry from the IGDP API.")]
-    public async Task<IActionResult> GetByIdAsync(string id)
+    public async Task<IActionResult> GetByIdAsync(int id)
     {
         try
         {
