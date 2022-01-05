@@ -1,4 +1,3 @@
-using MyGames.API.HostedServices;
 using MyGames.Core.AppSettings;
 using MyGames.Core.Services;
 using Serilog;
@@ -35,8 +34,6 @@ builder.Services.AddSingleton<GamesService>();
 // Register http clients
 builder.Services.AddHttpClient<GamesService>();
 builder.Services.AddHttpClient<TwitchLoginService>();
-
-builder.Services.AddHostedService<BackgroundJobService>();
 
 var app = builder.Build();
 

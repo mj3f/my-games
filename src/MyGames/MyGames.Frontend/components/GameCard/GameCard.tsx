@@ -6,7 +6,7 @@ export interface GameCardProps {
     game: Game;
 }
 
-
+// TODO: Fix cover art image not working.
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
     console.log(game);
     return (
