@@ -167,6 +167,7 @@ public sealed class UsersService
             Name = g.Name,
             GameStatus = g.Status,
             IgdbId = g.IgdbId,
+            CoverArtUrl = g.CoverArtUrl,
             Notes = g.Notes.Select(n => new GameNoteDto
             {
                 Id = n.Id!,
