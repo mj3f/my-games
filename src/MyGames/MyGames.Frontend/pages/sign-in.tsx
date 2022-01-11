@@ -7,6 +7,12 @@ import AppContext from "../context/AppContext";
 import { AuthState } from "../models/auth/auth-state.interface";
 import { User } from "../models/user/user.model";
 
+class LoginRequest {
+    constructor(
+        public username: string,
+        public password: string) {}
+}
+
 const SignIn: NextPage = () => {
     const [username, setUsername] = useState(''); // not ideal after each keystroke, refactor this.
     const [password, setPassword] = useState('');
@@ -16,6 +22,19 @@ const SignIn: NextPage = () => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
 
+        await axios.post('http://localhost:5109/api/v0/auth', new LoginRequest(username, password))
+            .then(res => {
+                console.log('the token = ', res);
+                getUser();
+            })
+            .catch(err => console.error(err));
+
+
+       
+    };
+
+    // TODO: can this be done in the home component get props function?
+    const getUser = async () => {
         await axios.get('http://localhost:5109/api/v0/users/dummy')
             .then(res => {
                 let user: User = res.data;
@@ -25,14 +44,13 @@ const SignIn: NextPage = () => {
                     currentUser: user,
                     token: 'dummy_token'
                 };
-        
+
                 dispatch({ type: 'LOG_IN', payload: authState});
                 router.push('/');
             })
             .catch(err => console.error(err));
 
-            // TODO: Handle errors when username/password inputs don't match any db entries.
-       
+        // TODO: Handle errors when username/password inputs don't match any db entries.
     };
     
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';
