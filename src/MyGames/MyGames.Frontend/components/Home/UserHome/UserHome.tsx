@@ -1,10 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import AppContext from "../../context/AppContext";
-import { GameStatus } from "../../models/game/game-status.enum";
-import { User } from "../../models/user/user.model";
-import Button from "../Button/Button";
-import UserGamesCollection from "./UserGamesCollection";
-import Modal from "../Modal/Modal";
+import AppContext from "../../../context/AppContext";
+import { GameStatus } from "../../../models/game/game-status.enum";
+import { User } from "../../../models/user/user.model";
+import Button from "../../Button/Button";
+import UserGamesCollection from "../UserGamesCollection";
+import Modal from "../../Modal/Modal";
+import AddGame from "./AddGame";
 
 
 // Logged in user home page.
@@ -38,8 +39,12 @@ const UserHome: React.FC = () => { // TODO: types in props.
             <UserGamesCollection games={user?.games.filter(g => g.gameStatus === GameStatus.InProgress)} title="In Progress" />
             <UserGamesCollection games={user?.games.filter(g => g.gameStatus === GameStatus.Backlog)} title="Backlog" />
             <UserGamesCollection games={user?.games.filter(g => g.gameStatus === GameStatus.Wishlist)} title="Wishlist" />
-            <Modal isOpen={showAddGameModal} onClose={() => setShowAddGameModal(false)} title="Add Game">
-                <p>Show me what you got!</p>
+            <Modal
+                isOpen={showAddGameModal}
+                onClose={() => setShowAddGameModal(false)}
+                title="Add Game"
+                hideSubmitButton>
+                    <AddGame></AddGame>
             </Modal>
         </div>
     );

@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useContext, useEffect, useState } from 'react';
 import DefaultHome from '../components/Home/DefaultHome';
-import UserHome from '../components/Home/UserHome';
+import UserHome from '../components/Home/UserHome/UserHome';
 import Layout from '../components/Layout/Layout';
 import AppContext from '../context/AppContext';
 import { User } from '../models/user/user.model';
