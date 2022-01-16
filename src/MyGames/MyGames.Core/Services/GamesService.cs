@@ -95,6 +95,30 @@ public sealed class GamesService
 
     }
 
+    public async Task<IgdbGameDto?> GetGameByName(string name)
+    {
+        var games = await _client.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+            query: $"search \"{name}\"; fields id,name,cover,genres.name,platforms.name,artworks.image_id;");
+        var game = games.FirstOrDefault(); // TODO: return multiple games
+
+        if (game is not null)
+        {
+            var artworkImageId = game.Artworks?.Values.FirstOrDefault()?.ImageId;
+            string coverUrl = IGDB.ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false);
+            
+            return new IgdbGameDto
+            {
+                Id = game.Id,
+                Name = game.Name,
+                Genres = game.Genres?.Values.Select(genre => genre.Name).ToList(),
+                Platforms = game.Platforms?.Values.Select(platform => platform.Name).ToList(),
+                CoverArtUrl = coverUrl
+            };
+        }
+
+        return null; // TODO: this is a carbon copy of the getGame method, refactor this once confirmation that this works.
+    }
+
     /// <summary>
     /// Returns a new instance of an IGDB Client.
     /// </summary>

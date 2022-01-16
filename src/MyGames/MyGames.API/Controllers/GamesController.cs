@@ -19,10 +19,23 @@ public sealed class GamesController : ControllerBase
     [ProducesResponseType(typeof(List<IgdbGameDto>), 200)]
     [ProducesResponseType(404)]
     [Description("Returns a list of game entries from the IGDP API.")]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync([FromQuery] string? name)
     {
         try
         {
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                IgdbGameDto? game = await _gamesService.GetGameByName(name);
+
+                if (game is null)
+                {
+                    return NotFound("Could not find a game with that name.");
+                }
+
+                return Ok(game);
+            }
+            
             List<IgdbGameDto>? games = await _gamesService.GetGames();
             
             if (games is null)
@@ -41,6 +54,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(IgdbGameDto), 200)]
     [ProducesResponseType(404)]
+    [ProducesResponseType(400)]
     [Description("Returns a game entry from the IGDP API.")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
@@ -57,7 +71,7 @@ public sealed class GamesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return NotFound(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 }
