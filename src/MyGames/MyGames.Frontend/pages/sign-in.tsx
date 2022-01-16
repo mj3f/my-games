@@ -16,6 +16,8 @@ class LoginRequest {
 const SignIn: NextPage = () => {
     const [username, setUsername] = useState(''); // not ideal after each keystroke, refactor this.
     const [password, setPassword] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+
     const [_, dispatch] = useContext(AppContext);
     const router = useRouter();
 
@@ -27,10 +29,7 @@ const SignIn: NextPage = () => {
                 console.log('the token = ', res);
                 getUser();
             })
-            .catch(err => console.error(err));
-
-
-       
+            .catch(error => setErrorMsg(error.response.data));
     };
 
     // TODO: can this be done in the home component get props function?
@@ -52,6 +51,8 @@ const SignIn: NextPage = () => {
 
         // TODO: Handle errors when username/password inputs don't match any db entries.
     };
+
+    const clearErrorMsg = () => errorMsg.length === 0 ?? setErrorMsg('');
     
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';
     
@@ -66,17 +67,18 @@ const SignIn: NextPage = () => {
                             type="text"
                             id="username"
                             className={formClass}
-                            onChange={(e) => setUsername(e.target.value)} />
+                            onChange={(e) => { setUsername(e.target.value); clearErrorMsg() }} />
                     </div>
-                    <div className="flex flex-col py-4">
+                    <div className="flex flex-col pb-4">
                         <label htmlFor="password">Password</label>
                         <input
                             type="password"
                             id="password"
                             className={formClass}
-                            onChange={(e) => setPassword(e.target.value)} />
+                            onChange={(e) => { setPassword(e.target.value); clearErrorMsg() }} />
                     </div>
-                    <div className="flex flex-col py-4">
+                    <div className="flex flex-col pb-4">
+                        <p className="mb-2 text-center text-red-600">{errorMsg}</p>
                         <Button
                             disabled={username.length === 0 || password.length === 0}
                             type="submit">Sign In</Button>
