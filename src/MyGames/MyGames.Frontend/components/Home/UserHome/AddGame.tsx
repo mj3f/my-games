@@ -4,11 +4,11 @@ import { Game } from "../../../models/game/game.model";
 
 
 const AddGame: React.FC = () => {
-    const [game, setGame] = useState<Game>(null!);
+    const [games, setGames] = useState<Game[]>([]);
 
     const searchForGame = async (name: string) => {
         await axios.get(`http://localhost:5109/api/v0/games?name=${name}`)
-        .then(res => setGame(res.data))
+        .then(res => setGames(res.data))
         .catch(err => console.error(err));
     };
 
@@ -18,10 +18,12 @@ const AddGame: React.FC = () => {
         <div className="flex w-full">
             <input 
                 className={inputClass}
-                type="test"
+                type="text"
                 name="game"
                 onChange={(e) => searchForGame(e.target.value)} />
-            <div>found game: {game?.name}</div>
+            <ul>
+                {games.map(game => <li key={game.id}>{game.name}</li>)}
+            </ul>
         </div>
     );
 };

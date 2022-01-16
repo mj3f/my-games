@@ -23,20 +23,7 @@ public sealed class GamesController : ControllerBase
     {
         try
         {
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                IgdbGameDto? game = await _gamesService.GetGameByName(name);
-
-                if (game is null)
-                {
-                    return NotFound("Could not find a game with that name.");
-                }
-
-                return Ok(game);
-            }
-            
-            List<IgdbGameDto>? games = await _gamesService.GetGames();
+            List<IgdbGameDto>? games = await _gamesService.GetGames(name);
             
             if (games is null)
             {

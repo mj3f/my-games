@@ -35,9 +35,12 @@ public sealed class GamesService
     /// Get a collection of games from the IGDB API.
     /// </summary>
     /// <returns>A list of <see cref="IgdbGameDto"/></returns>
-    public async Task<List<IgdbGameDto>?> GetGames()
+    public async Task<List<IgdbGameDto>?> GetGames(string? name = null)
     {
-        var games = await _client.QueryAsync<Game>(IGDBClient.Endpoints.Games, query: "fields id,name,cover,genres.name,platforms.name,artworks.image_id;;");
+        string searchQuery = !string.IsNullOrEmpty(name) ? searchQuery = $"search \"{name}\";" : string.Empty;
+        
+        var games = await _client.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+            query: $"{searchQuery} fields id,name,cover,genres.name,platforms.name,artworks.image_id;");
 
         if (games is null)
         {
@@ -93,30 +96,6 @@ public sealed class GamesService
         return null;
         // var games2 = await _client.QueryAsync<Game>(IGDB.IGDBClient.Endpoints.Games, query: "fields artworks.image_id; where id = 4;");
 
-    }
-
-    public async Task<IgdbGameDto?> GetGameByName(string name)
-    {
-        var games = await _client.QueryAsync<Game>(IGDBClient.Endpoints.Games,
-            query: $"search \"{name}\"; fields id,name,cover,genres.name,platforms.name,artworks.image_id;");
-        var game = games.FirstOrDefault(); // TODO: return multiple games
-
-        if (game is not null)
-        {
-            var artworkImageId = game.Artworks?.Values.FirstOrDefault()?.ImageId;
-            string coverUrl = IGDB.ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false);
-            
-            return new IgdbGameDto
-            {
-                Id = game.Id,
-                Name = game.Name,
-                Genres = game.Genres?.Values.Select(genre => genre.Name).ToList(),
-                Platforms = game.Platforms?.Values.Select(platform => platform.Name).ToList(),
-                CoverArtUrl = coverUrl
-            };
-        }
-
-        return null; // TODO: this is a carbon copy of the getGame method, refactor this once confirmation that this works.
     }
 
     /// <summary>
