@@ -6,12 +6,8 @@ import Button from "../components/Button/Button";
 import AppContext from "../context/AppContext";
 import { AuthState } from "../models/auth/auth-state.interface";
 import { User } from "../models/user/user.model";
-
-class LoginRequest {
-    constructor(
-        public username: string,
-        public password: string) {}
-}
+import { AuthService } from "../services/auth.service";
+import { UsersService } from "../services/users.service";
 
 const SignIn: NextPage = () => {
     const [username, setUsername] = useState(''); // not ideal after each keystroke, refactor this.
@@ -20,24 +16,20 @@ const SignIn: NextPage = () => {
 
     const [_, dispatch] = useContext(AppContext);
     const router = useRouter();
+    const authService = new AuthService();
+    const usersService = new UsersService();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
-
-        await axios.post('http://localhost:5109/api/v0/auth', new LoginRequest(username, password))
-            .then(res => {
-                console.log('the token = ', res);
-                getUser();
-            })
+        await authService.login(username, password)
+            .then(res => getUser())
             .catch(error => setErrorMsg(error.response.data));
     };
 
     // TODO: can this be done in the home component get props function?
     const getUser = async () => {
-        await axios.get('http://localhost:5109/api/v0/users/dummy')
-            .then(res => {
-                let user: User = res.data;
-
+        await usersService.getUser()
+            .then(user => {
                 const authState: AuthState = {
                     isAuthenticated: true,
                     currentUser: user,
@@ -47,7 +39,7 @@ const SignIn: NextPage = () => {
                 dispatch({ type: 'LOG_IN', payload: authState});
                 router.push('/');
             })
-            .catch(err => console.error(err));
+            .catch(error => console.error(error));
 
         // TODO: Handle errors when username/password inputs don't match any db entries.
     };

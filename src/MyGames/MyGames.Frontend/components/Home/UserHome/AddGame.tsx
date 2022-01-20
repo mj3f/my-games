@@ -1,15 +1,15 @@
-import axios from "axios";
 import { useState } from "react";
 import { Game } from "../../../models/game/game.model";
+import { GamesService } from "../../../services/games.service";
 
 
 const AddGame: React.FC = () => {
     const [games, setGames] = useState<Game[]>([]);
+    const gamesService = new GamesService();
 
     const searchForGame = async (name: string) => {
-        await axios.get(`http://localhost:5109/api/v0/games?name=${name}`)
-        .then(res => setGames(res.data))
-        .catch(err => console.error(err));
+        await gamesService.searchForGame(name)
+            .then((games: Game[]) => setGames(games));
     };
 
     const inputClass = 'rounded w-full h-8 mt-1 pl-1 outline-green-500 ring ring-green-500';
