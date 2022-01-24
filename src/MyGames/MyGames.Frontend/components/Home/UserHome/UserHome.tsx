@@ -6,6 +6,8 @@ import Button from "../../Button/Button";
 import UserGamesCollection from "../UserGamesCollection";
 import Modal from "../../Modal/Modal";
 import AddGame from "./AddGame";
+import {IgdbGame} from "../../../models/game/igdb-game.model";
+import {UsersService} from "../../../services/users.service";
 
 
 // Logged in user home page.
@@ -22,8 +24,16 @@ const UserHome: React.FC = () => { // TODO: types in props.
     },
     [appState]);
 
-    const addGame = () => {
+    const openAddGameModal = () => {
         setShowAddGameModal(true);
+    };
+
+    const addGameToUsersLibrary = async (game: IgdbGame) => {
+        const usersService = new UsersService(); // TODO: Inject this?
+        // TODO: addGame should return the game, then we can add it to the users games.
+        await usersService.addGameToUsersLibrary(user.username, game)
+            .then(res => console.log(res))
+            .catch(error => console.error(error));
     };
 
     if (!user) {
@@ -34,7 +44,7 @@ const UserHome: React.FC = () => { // TODO: types in props.
         <div className="px-2 flex flex-col justify-start">
             <div className="flex flex-row pt-2 justify-between">
                 <p className="text-4xl font-semibold">{user?.username}&apos;s Library</p>
-                <Button onClick={addGame}>Add Game</Button>
+                <Button onClick={openAddGameModal}>Add Game</Button>
             </div>
             <UserGamesCollection games={user?.games.filter(g => g.gameStatus === GameStatus.InProgress)} title="In Progress" />
             <UserGamesCollection games={user?.games.filter(g => g.gameStatus === GameStatus.Backlog)} title="Backlog" />
@@ -44,7 +54,7 @@ const UserHome: React.FC = () => { // TODO: types in props.
                 onClose={() => setShowAddGameModal(false)}
                 title="Add Game"
                 hideSubmitButton>
-                    <AddGame></AddGame>
+                    <AddGame selectGame={addGameToUsersLibrary}></AddGame>
             </Modal>
         </div>
     );
