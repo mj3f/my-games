@@ -28,12 +28,10 @@ builder.Services.AddCors();
 
 // - Singletons
 builder.Services.AddSingleton<UsersService>();
-builder.Services.AddSingleton<TwitchLoginService>();
 builder.Services.AddSingleton<GamesService>();
 
 // Register http clients
 builder.Services.AddHttpClient<GamesService>();
-builder.Services.AddHttpClient<TwitchLoginService>();
 
 var app = builder.Build();
 
