@@ -1,5 +1,6 @@
 import { Game } from "../../models/game/game.model";
-import GameCard from "../GameCard/GameCard";
+import GameCard from "../Game/GameCard/GameCard";
+
 
 interface UserGamesCollectionProps {
     games: Game[];
