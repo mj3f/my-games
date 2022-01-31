@@ -152,6 +152,27 @@ public sealed class UsersService
         }
     }
 
+    public async Task UpdateGameInUsersLibrary(string username, GameDto game)
+    {
+        if (string.IsNullOrEmpty(username) || game is null)
+        {
+            return;
+        }
+
+        try
+        {
+            // TODO: How to find the game from the users games list, and update it?
+            // var update = Builders<User>.Update.Set(u => u.Games,
+            //     g => g.Id == game.Id);
+            // var result = await _usersCollection.FindOneAndUpdateAsync()
+        }
+        catch (Exception ex)
+        {
+            Logger.Error("[UsersService] Error occurred whilst trying update the game. " + ex.Message);
+            throw;
+        }
+    }
+
     /// <summary>
     /// Converts a user schema returned from the mongoDB users collection into a User Dto.
     /// </summary>

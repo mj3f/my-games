@@ -1,15 +1,10 @@
 import { Game } from "../../../models/game/game.model";
 import Image from "next/image";
+import GameDetailButton from "./GameDetailButton";
 
 export interface GameDetailProps {
     game: Game;
 }
-
-const GameDetailButton: React.FC = ({ children }) =>
-    <button
-        className="w-fit p-2 bg-gray-200 rounded hover:bg-gray-300 mr-2">
-            {children}
-    </button>;
 
 const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
     const image = game.coverArtUrl ? 
@@ -22,9 +17,9 @@ const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
             quality={100} /> :
         null;
     
-    const moveToBacklogButton = <GameDetailButton>Move to Backlog</GameDetailButton>
-    const moveToWishlistButton = <GameDetailButton>Move to Wishlist</GameDetailButton>
-    const startProgressButton = <GameDetailButton>Start Progress</GameDetailButton>
+    const moveToBacklogButton = <GameDetailButton onClick={() => console.log('moving to backlog')}>Move to Backlog</GameDetailButton>
+    const moveToWishlistButton = <GameDetailButton onClick={() => console.log('moving to wishlist')}>Move to Wishlist</GameDetailButton>
+    const startProgressButton = <GameDetailButton onClick={() => console.log('starting progress')}>Start Progress</GameDetailButton>
 
     return (
         <div className="flex flex-row h-full w-full">
@@ -41,6 +36,7 @@ const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
                     </div>
                 </div>
                 <p>Your notes about this game:</p>
+                {game.notes.map(note => <div>{note.content}</div>)}
             </div>
         </div>
     );
