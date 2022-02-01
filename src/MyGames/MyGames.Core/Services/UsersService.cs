@@ -161,10 +161,21 @@ public sealed class UsersService
 
         try
         {
-            // TODO: How to find the game from the users games list, and update it?
-            // var update = Builders<User>.Update.Set(u => u.Games,
-            //     g => g.Id == game.Id);
-            // var result = await _usersCollection.FindOneAndUpdateAsync()
+            User user = _usersCollection
+                .AsQueryable()
+                .First(u => u.Username == username);
+
+            Game existingGame = user.Games.First(g => g.Id == game.Id);
+            existingGame.Notes = game.Notes.Select(note => new GameNote
+            {
+                Content = note.Content,
+                CreatedAt = note.CreatedAt,
+                Id = note.Id
+            }).ToList();
+            existingGame.Status = game.GameStatus;
+
+            var filter = Builders<User>.Filter.Eq(u => u.Username, username);
+            await _usersCollection.ReplaceOneAsync(filter, user);
         }
         catch (Exception ex)
         {

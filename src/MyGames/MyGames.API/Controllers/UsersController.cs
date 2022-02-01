@@ -50,6 +50,23 @@ public sealed class UsersController : ControllerBase
     {
         throw new NotImplementedException();
     }
+
+    [HttpPut("{username}/game")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [Description("Updates a game in a users library.")]
+    public async Task<IActionResult> UpdateGameAsync(string username, [FromBody] GameDto game)
+    {
+        try
+        {
+            await _usersService.UpdateGameInUsersLibrary(username, game);
+            return Ok("game updated.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
     
     [HttpPut("{username}/add-game")]
     [ProducesResponseType( 200)]
