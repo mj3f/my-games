@@ -1,12 +1,28 @@
 import { Game } from "../../../models/game/game.model";
 import Image from "next/image";
 import GameDetailButton from "./GameDetailButton";
+import { UsersService } from "../../../services/users.service";
+import AppContext from "../../../context/AppContext";
+import { useContext } from "react";
+import { GameStatus } from "../../../models/game/game-status.enum";
 
 export interface GameDetailProps {
     game: Game;
 }
 
 const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
+    const [appState, _] = useContext(AppContext);
+    const userService = new UsersService();
+
+    const updateGame = (status: string) => {
+
+        if (appState.authState?.currentUser) {
+            const username = appState.authState.currentUser.username;
+            const updatedGame: Game = { ...game, gameStatus: status };
+            userService.updateGameInUsersLibrary(username, updatedGame);
+        }
+    };
+
     const image = game.coverArtUrl ? 
         <Image
             className="rounded"
@@ -17,9 +33,9 @@ const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
             quality={100} /> :
         null;
     
-    const moveToBacklogButton = <GameDetailButton onClick={() => console.log('moving to backlog')}>Move to Backlog</GameDetailButton>
-    const moveToWishlistButton = <GameDetailButton onClick={() => console.log('moving to wishlist')}>Move to Wishlist</GameDetailButton>
-    const startProgressButton = <GameDetailButton onClick={() => console.log('starting progress')}>Start Progress</GameDetailButton>
+    const moveToBacklogButton = <GameDetailButton onClick={() => updateGame(GameStatus.Backlog)}>Move to Backlog</GameDetailButton>
+    const moveToWishlistButton = <GameDetailButton onClick={() => updateGame(GameStatus.Wishlist)}>Move to Wishlist</GameDetailButton>
+    const startProgressButton = <GameDetailButton onClick={() => updateGame(GameStatus.InProgress)}>Start Progress</GameDetailButton>
 
     return (
         <div className="flex flex-row h-full w-full">
