@@ -7,13 +7,15 @@ import { GameStatus } from "../../../models/game/game-status.enum";
 
 export interface GameDetailProps {
     game: Game;
+    onClose: () => void;
 }
 
-const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
+const GameDetail: React.FC<GameDetailProps> = ({ game, onClose }) => {
     const [_, dispatch] = useContext(AppContext);
     
     const updateGame = (status: string) => {
         dispatch({ type: 'UPDATE_GAME', payload: { ...game, gameStatus: status }});
+        onClose();
     };
 
     const image = game.coverArtUrl ? 

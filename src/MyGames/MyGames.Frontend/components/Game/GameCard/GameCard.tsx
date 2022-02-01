@@ -32,7 +32,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
                     onClose={() => setShowModal(false)}
                     title={game.name}
                     hideSubmitButton>
-                        <GameDetail game={game} />            
+                        <GameDetail game={game} onClose={() => setShowModal(false)} />            
                 </Modal>
             </div>
         </>
