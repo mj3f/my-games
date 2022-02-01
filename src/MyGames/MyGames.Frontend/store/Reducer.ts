@@ -1,10 +1,12 @@
 import { AppState } from "../models/app-state.interface";
 import { AuthState } from "../models/auth/auth-state.interface";
+import { Game } from "../models/game/game.model";
 import { CacheService } from "../services/CacheService";
 
 export type ReducerActionType = 
     | 'LOG_IN'
     | 'LOG_OUT'
+    | 'UPDATE_GAME'
 
 export interface ReducerAction {
     type: ReducerActionType;
@@ -33,6 +35,12 @@ const Reducer = (state: AppState, action: ReducerAction) => {
                 }
             };
             cacheState(newState);
+            return newState;
+        case 'UPDATE_GAME':
+            newState = {
+                ...state,
+                updateGame: action.payload as Game
+            }
             return newState;
         default:
             return state;

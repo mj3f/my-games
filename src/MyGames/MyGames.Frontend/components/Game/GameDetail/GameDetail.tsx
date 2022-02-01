@@ -1,7 +1,6 @@
 import { Game } from "../../../models/game/game.model";
 import Image from "next/image";
 import GameDetailButton from "./GameDetailButton";
-import { UsersService } from "../../../services/users.service";
 import AppContext from "../../../context/AppContext";
 import { useContext } from "react";
 import { GameStatus } from "../../../models/game/game-status.enum";
@@ -11,16 +10,10 @@ export interface GameDetailProps {
 }
 
 const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
-    const [appState, _] = useContext(AppContext);
-    const userService = new UsersService();
-
+    const [_, dispatch] = useContext(AppContext);
+    
     const updateGame = (status: string) => {
-
-        if (appState.authState?.currentUser) {
-            const username = appState.authState.currentUser.username;
-            const updatedGame: Game = { ...game, gameStatus: status };
-            userService.updateGameInUsersLibrary(username, updatedGame);
-        }
+        dispatch({ type: 'UPDATE_GAME', payload: { ...game, gameStatus: status }});
     };
 
     const image = game.coverArtUrl ? 
@@ -32,10 +25,6 @@ const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
             objectFit="cover"
             quality={100} /> :
         null;
-    
-    const moveToBacklogButton = <GameDetailButton onClick={() => updateGame(GameStatus.Backlog)}>Move to Backlog</GameDetailButton>
-    const moveToWishlistButton = <GameDetailButton onClick={() => updateGame(GameStatus.Wishlist)}>Move to Wishlist</GameDetailButton>
-    const startProgressButton = <GameDetailButton onClick={() => updateGame(GameStatus.InProgress)}>Start Progress</GameDetailButton>
 
     return (
         <div className="flex flex-row h-full w-full">
@@ -46,9 +35,9 @@ const GameDetail: React.FC<GameDetailProps> = ({ game }) => {
                 <div className="flex flex-row">
                     <p>Status in your library: <span className="font-semibold">{game.gameStatus}</span></p>
                     <div className="flex pl-2 w-full justify-end">
-                        {moveToBacklogButton}
-                        {moveToWishlistButton}
-                        {startProgressButton}
+                        <GameDetailButton onClick={() => updateGame(GameStatus.Backlog)}>Move to Backlog</GameDetailButton>
+                        <GameDetailButton onClick={() => updateGame(GameStatus.Wishlist)}>Move to Wishlist</GameDetailButton>
+                        <GameDetailButton onClick={() => updateGame(GameStatus.InProgress)}>Start Progress</GameDetailButton>
                     </div>
                 </div>
                 <p>Your notes about this game:</p>

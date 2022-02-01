@@ -6,20 +6,27 @@ import Button from "../../Button/Button";
 import UserGamesCollection from "../UserGamesCollection";
 import Modal from "../../Modal/Modal";
 import AddGame from "./AddGame";
-import {IgdbGame} from "../../../models/game/igdb-game.model";
-import {UsersService} from "../../../services/users.service";
+import { IgdbGame } from "../../../models/game/igdb-game.model";
+import { UsersService } from "../../../services/users.service";
+import { Game } from "../../../models/game/game.model";
 
 
 // Logged in user home page.
 const UserHome: React.FC = () => { // TODO: types in props.
-    const [appState, _] = useContext(AppContext);
+    const [appState, dispatch] = useContext(AppContext);
     const [user, setUser] = useState<User>(null!);
     const [showAddGameModal, setShowAddGameModal] = useState(false);
+    const usersService = new UsersService(); // TODO: Inject this?
 
     // On mount, get the logged in user and store it in state in case changes are made.
     useEffect(() => {
         if (appState.authState?.currentUser) {
             setUser(appState.authState.currentUser);
+        }
+
+        if (appState.updateGame) {
+            updateGame(appState.updateGame);
+            // dispatch({ type: 'UPDATE_GAME', payload: null}); // clear it from state.
         }
     },
     [appState]);
@@ -29,11 +36,30 @@ const UserHome: React.FC = () => { // TODO: types in props.
     };
 
     const addGameToUsersLibrary = async (game: IgdbGame) => {
-        const usersService = new UsersService(); // TODO: Inject this?
         // TODO: addGame should return the game, then we can add it to the users games.
         await usersService.addGameToUsersLibrary(user.username, game)
             .then(res => console.log(res))
             .catch(error => console.error(error));
+    };
+
+    const updateGame = async (game: Game) => {
+        if (user) {
+            const username = user.username;
+            await usersService.updateGameInUsersLibrary(username, game)
+                .then(() => {
+                    const updatedUser = { ...user };
+                    console.log('updated user games (before) = ', updatedUser.games);
+                    const existingGame: Game | undefined =
+                        updatedUser.games.find(g => g.id === game.id);
+                    if (existingGame) {
+                        existingGame.gameStatus = game.gameStatus;
+                        existingGame.notes = game.notes;
+                    }
+                    console.log('updated user games (after) = ', updatedUser.games);
+                    setUser(updatedUser);
+                })
+                .catch(error => console.error(error));
+        }
     };
 
     if (!user) {
