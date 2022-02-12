@@ -1,5 +1,6 @@
 using MyGames.Core.AppSettings;
 using MyGames.Core.Services;
+using MyGames.Core.Services.Interfaces;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,11 +28,8 @@ builder.Services.AddMemoryCache();
 builder.Services.AddCors();
 
 // - Singletons
-builder.Services.AddSingleton<UsersService>();
-builder.Services.AddSingleton<GamesService>();
-
-// Register http clients
-builder.Services.AddHttpClient<GamesService>();
+builder.Services.AddSingleton<IUsersService, UsersService>();
+builder.Services.AddSingleton<IGamesService, GamesService>();
 
 var app = builder.Build();
 

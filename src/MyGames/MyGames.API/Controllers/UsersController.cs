@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc;
 using MyGames.Core.Dtos;
 using MyGames.Core.Services;
+using MyGames.Core.Services.Interfaces;
 
 namespace MyGames.API.Controllers;
 
@@ -10,9 +11,9 @@ namespace MyGames.API.Controllers;
 [Produces("application/json")]
 public sealed class UsersController : ControllerBase
 {
-    private readonly UsersService _usersService;
+    private readonly IUsersService _usersService;
 
-    public UsersController(UsersService usersService) => _usersService = usersService;
+    public UsersController(IUsersService usersService) => _usersService = usersService;
     
     [HttpGet]
     [ProducesResponseType(typeof(List<UserDto>), 200)]

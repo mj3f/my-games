@@ -1,14 +1,8 @@
 namespace MyGames.Core.Dtos;
 
-public class LoginDto
+/// <summary>
+/// Record to capture the Unique identifier of the user, as well as their password.
+/// </summary>
+public record LoginDto(string Username, string Password)
 {
-    /// <summary>
-    /// Unique identifier of the user.
-    /// </summary>
-    public string Username { get; set; }
-    
-    /// <summary>
-    /// Users password.
-    /// </summary>
-    public string Password { get; set; }
 }

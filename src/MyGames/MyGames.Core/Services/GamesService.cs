@@ -1,11 +1,9 @@
-using System.Text.Json;
 using IGDB;
 using IGDB.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MyGames.Core.AppSettings;
 using MyGames.Core.Dtos;
-using MyGames.Core.Models;
+using MyGames.Core.Services.Interfaces;
 using Serilog;
 
 namespace MyGames.Core.Services;
@@ -14,20 +12,14 @@ namespace MyGames.Core.Services;
 /// Wrapper service to call IGDB to get games data.
 /// To get a users games, see UsersService.
 /// </summary>
-public sealed class GamesService
+public sealed class GamesService : IGamesService
 {
     private static readonly ILogger Logger = Log.ForContext<GamesService>();
-    private const string IgdbApiEndpoint = "https://api.igdb.com/v4/";
-    
-    private readonly HttpClient _httpClient;
-    private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     private readonly IGDBClient _client;
     
-    public GamesService(IOptions<TwitchLoginSettings> loginSettings, HttpClient httpClient)
+    public GamesService(IOptions<TwitchLoginSettings> loginSettings)
     {
-        _httpClient = httpClient;
-        _jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         _client = CreateIGDBClient(loginSettings.Value.ClientId, loginSettings.Value.ClientSecret);
     }
 
@@ -37,22 +29,24 @@ public sealed class GamesService
     /// <returns>A list of <see cref="IgdbGameDto"/></returns>
     public async Task<List<IgdbGameDto>?> GetGames(string? name = null)
     {
-        string searchQuery = !string.IsNullOrEmpty(name) ? searchQuery = $"search \"{name}\";" : string.Empty;
+        string searchQuery = !string.IsNullOrEmpty(name) ? $"search \"{name}\";" : string.Empty;
         
         var games = await _client.QueryAsync<Game>(IGDBClient.Endpoints.Games,
             query: $"{searchQuery} fields id,name,cover,genres.name,platforms.name,artworks.image_id;");
 
         if (games is null)
         {
+            Logger.Error("[GAMES SERVICE] No games found.");
             return null;
         }
 
         var gamesList = new List<IgdbGameDto>();
+
         foreach (var game in games)
         {
             string? artworkImageId = game.Artworks?.Values.FirstOrDefault()?.ImageId;
             string coverUrl = !string.IsNullOrEmpty(artworkImageId)
-                ? IGDB.ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false)
+                ? ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false)
                 : string.Empty;
             
             gamesList.Add(new IgdbGameDto
@@ -81,7 +75,7 @@ public sealed class GamesService
         if (game is not null)
         {
             var artworkImageId = game.Artworks?.Values.FirstOrDefault()?.ImageId;
-            string coverUrl = IGDB.ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false);
+            string coverUrl = ImageHelper.GetImageUrl(imageId: artworkImageId, size: ImageSize.CoverSmall, retina: false);
             
             return new IgdbGameDto
             {
@@ -93,9 +87,8 @@ public sealed class GamesService
             };
         }
 
+        Logger.Error($"[GAMES SERVICE] No game found with id {id}");
         return null;
-        // var games2 = await _client.QueryAsync<Game>(IGDB.IGDBClient.Endpoints.Games, query: "fields artworks.image_id; where id = 4;");
-
     }
 
     /// <summary>
@@ -104,12 +97,6 @@ public sealed class GamesService
     /// <param name="clientId"></param>
     /// <param name="clientSecret"></param>
     /// <returns></returns>
-    private IGDBClient CreateIGDBClient(string clientId, string clientSecret)
-    {
-        return new IGDBClient(
-            clientId,
-            clientSecret
-        );
-    }
+    private IGDBClient CreateIGDBClient(string clientId, string clientSecret) => new(clientId, clientSecret);
 
 }

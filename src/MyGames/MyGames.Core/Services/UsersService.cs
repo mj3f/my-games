@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using MyGames.Core.AppSettings;
 using MyGames.Core.Dtos;
 using MyGames.Core.Enums;
+using MyGames.Core.Services.Interfaces;
 using MyGames.Core.Utils;
 using Serilog;
 
@@ -12,7 +13,7 @@ namespace MyGames.Core.Services;
 /// <summary>
 /// Service to fetch user data from the myGames API.
 /// </summary>
-public sealed class UsersService
+public sealed class UsersService : IUsersService
 {
     private static readonly ILogger Logger = Log.ForContext<UsersService>();
     
@@ -77,12 +78,14 @@ public sealed class UsersService
     {
         if (string.IsNullOrEmpty(username))
         {
+            Logger.Error("[USERS SERVICE] No username provided.");
             return null;
         }
         
         var user = await _usersCollection.Find(u => u.Username == username).FirstOrDefaultAsync();
         if (user is null)
         {
+            Logger.Error($"[USERS SERVICE] No user found with username {username}");
             return null;
         }
         
@@ -98,6 +101,7 @@ public sealed class UsersService
     {
         if (string.IsNullOrEmpty(username))
         {
+            Logger.Error("[USERS SERVICE] No username provided when trying to add a game.");
             return;
         }
         
@@ -134,6 +138,7 @@ public sealed class UsersService
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(gameId))
         {
+            Logger.Error("[USERS SERVICE] No username or game ID provided whilst trying to remove a game from users library.");
             return;
         }
         
@@ -156,6 +161,7 @@ public sealed class UsersService
     {
         if (string.IsNullOrEmpty(username) || game is null)
         {
+            Logger.Error("[USERS SERVICE] No username or game object provided whilst trying to update game.");
             return;
         }
 
@@ -189,7 +195,7 @@ public sealed class UsersService
     /// </summary>
     /// <param name="user"></param>
     /// <returns>A <see cref="UserDto"/></returns>
-    private UserDto ConvertUserToUserDto(User user) => new UserDto
+    private UserDto ConvertUserToUserDto(User user) => new()
     {
         Id = user.Id!,
         Username = user.Username,

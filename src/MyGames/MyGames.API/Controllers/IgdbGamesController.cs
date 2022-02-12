@@ -3,17 +3,18 @@ using IGDB.Models;
 using Microsoft.AspNetCore.Mvc;
 using MyGames.Core.Dtos;
 using MyGames.Core.Services;
+using MyGames.Core.Services.Interfaces;
 
 namespace MyGames.API.Controllers;
 
 [ApiController]
 [Route("api/v0/games")]
 [Produces("application/json")]
-public sealed class GamesController : ControllerBase
+public sealed class IdgbGamesController : ControllerBase
 {
-    private readonly GamesService _gamesService;
+    private readonly IGamesService _gamesService;
 
-    public GamesController(GamesService gamesService) => _gamesService = gamesService;
+    public IdgbGamesController(IGamesService gamesService) => _gamesService = gamesService;
 
     [HttpGet]
     [ProducesResponseType(typeof(List<IgdbGameDto>), 200)]

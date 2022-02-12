@@ -1,6 +1,10 @@
 namespace MyGames.Core.Dtos;
 
-public sealed class GameDto
+/// <summary>
+/// DTO for representing a users game(s) in their collection, stored in MongoDB.
+/// (Note: this DTO is distinct from IgdbGameDto, which contains the information of a game fetched from the IGDB API.)
+/// </summary>
+public sealed class GameDto // TODO: Convert to Record?
 {
     /// <summary>
     /// Unique identifier.
@@ -31,22 +35,4 @@ public sealed class GameDto
     /// List of user-created notes for this game.
     /// </summary>
     public List<GameNoteDto> Notes { get; set; }
-}
-
-public sealed class GameNoteDto
-{
-    /// <summary>
-    /// Unique identifier.
-    /// </summary>
-    public string Id { get; set; }
-    
-    /// <summary>
-    /// When the note was created.
-    /// </summary>
-    public long CreatedAt { get; set; }
-    
-    /// <summary>
-    /// Contents of the note.
-    /// </summary>
-    public string Content { get; set; }
 }
