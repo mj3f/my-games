@@ -1,6 +1,8 @@
 using MyGames.Core.AppSettings;
+using MyGames.Core.Repositories;
 using MyGames.Core.Services;
 using MyGames.Core.Services.Interfaces;
+using MyGames.Database.Schemas;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +30,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddCors();
 
 // - Singletons
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IGamesService, GamesService>();
 

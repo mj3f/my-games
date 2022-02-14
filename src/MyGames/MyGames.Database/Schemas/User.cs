@@ -15,9 +15,8 @@ public class User
 
     [BsonElement("password")] 
     public string Password { get; set; } = null!;
-    
-    [BsonElement("games")] 
-    public ICollection<Game> Games { get; set; }
+
+    [BsonElement("games")] public ICollection<Game>? Games { get; set; }
 
 
 }

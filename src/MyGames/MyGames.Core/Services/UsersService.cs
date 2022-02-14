@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using MyGames.Core.AppSettings;
 using MyGames.Core.Dtos;
 using MyGames.Core.Enums;
+using MyGames.Core.Repositories;
 using MyGames.Core.Services.Interfaces;
 using MyGames.Core.Utils;
 using Serilog;
@@ -16,21 +17,11 @@ namespace MyGames.Core.Services;
 public sealed class UsersService : IUsersService
 {
     private static readonly ILogger Logger = Log.ForContext<UsersService>();
-    
-    private readonly IMongoCollection<User> _usersCollection;
-    
+
+    private readonly IUserRepository _repository;
+
     // dbSettings values populated from the appSettings.json file in the myGames.API project.
-    public UsersService(IOptions<MongoDbSettings> dbSettings)
-    {
-        var mongoClient = new MongoClient(
-            dbSettings.Value.ConnectionString);
-
-        IMongoDatabase mongoDatabase = mongoClient.GetDatabase(
-            dbSettings.Value.DatabaseName);
-
-        _usersCollection = mongoDatabase.GetCollection<User>(
-            dbSettings.Value.UsersCollectionName);
-    }
+    public UsersService(IUserRepository repository) => _repository = repository;
 
     /// <summary>
     /// Returns a list of users in the myGames Database.
@@ -39,34 +30,8 @@ public sealed class UsersService : IUsersService
     /// <returns>A list of <see cref="UserDto"/></returns>
     public async Task<List<UserDto>> GetUsers()
     {
-        var list = await _usersCollection.Find(_ => true).ToListAsync();
-        if (list is null || list.Count == 0)
-        {
-            return new List<UserDto>();
-        }
-        
+        var list = await _repository.GetAllAsync();
         return list.Select(ConvertUserToUserDto).ToList();
-    }
-
-    /// <summary>
-    /// Gets a user by the unique identifier (id) provided.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns>A <see cref="UserDto"/></returns>
-    public async Task<UserDto?> GetById(string id)
-    {
-        if (string.IsNullOrEmpty(id))
-        {
-            return null;
-        }
-        
-        var user = await _usersCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
-        if (user is null)
-        {
-            return null;
-        }
-        
-        return ConvertUserToUserDto(user);
     }
 
     /// <summary>
@@ -82,14 +47,9 @@ public sealed class UsersService : IUsersService
             return null;
         }
         
-        var user = await _usersCollection.Find(u => u.Username == username).FirstOrDefaultAsync();
-        if (user is null)
-        {
-            Logger.Error($"[USERS SERVICE] No user found with username {username}");
-            return null;
-        }
-        
-        return ConvertUserToUserDto(user);
+        var user = await _repository.GetByIdAsync(username);
+
+        return user is not null ? ConvertUserToUserDto(user) : null;
     }
 
     /// <summary>
@@ -118,9 +78,7 @@ public sealed class UsersService : IUsersService
 
         try
         {
-            await _usersCollection.FindOneAndUpdateAsync(
-                u => u.Username == username, // TODO: How to handle case where username does not match a user in the db?
-                Builders<User>.Update.AddToSet(u => u.Games, game));
+            await _repository.AddGameToUsersLibraryAsync(username, game);
         }
         catch (Exception ex)
         {
@@ -144,11 +102,7 @@ public sealed class UsersService : IUsersService
         
         try
         {
-            // https://stackoverflow.com/a/30145663
-            var update = Builders<User>.Update.PullFilter(u => u.Games,
-                g => g.Id == gameId);
-            
-            var result = await _usersCollection.FindOneAndUpdateAsync(u => u.Username == username, update);
+            await _repository.RemoveGameFromUsersLibraryAsync(username, gameId);
         }
         catch (Exception ex)
         {
@@ -164,24 +118,25 @@ public sealed class UsersService : IUsersService
             Logger.Error("[USERS SERVICE] No username or game object provided whilst trying to update game.");
             return;
         }
+        
+        var gameDb = new Game
+        {
+            Id = game.Id,
+            IgdbId = game.IgdbId,
+            Name = game.Name,
+            CoverArtUrl = game.CoverArtUrl,
+            Notes = game.Notes.Select(n => new GameNote
+            {
+                Content = n.Content,
+                CreatedAt = n.CreatedAt,
+                Id = n.Id
+            }).ToList(),
+            Status = game.GameStatus
+        };
 
         try
         {
-            User user = _usersCollection
-                .AsQueryable()
-                .First(u => u.Username == username);
-
-            Game existingGame = user.Games.First(g => g.Id == game.Id);
-            existingGame.Notes = game.Notes.Select(note => new GameNote
-            {
-                Content = note.Content,
-                CreatedAt = note.CreatedAt,
-                Id = note.Id
-            }).ToList();
-            existingGame.Status = game.GameStatus;
-
-            var filter = Builders<User>.Filter.Eq(u => u.Username, username);
-            await _usersCollection.ReplaceOneAsync(filter, user);
+            await _repository.UpdateGameInUsersLibraryAsync(username, gameDb);
         }
         catch (Exception ex)
         {
@@ -199,7 +154,7 @@ public sealed class UsersService : IUsersService
     {
         Id = user.Id!,
         Username = user.Username,
-        Games = user.Games.Select(g => new GameDto
+        Games = user.Games?.Select(g => new GameDto
         {
             Id = g.Id!,
             Name = g.Name,

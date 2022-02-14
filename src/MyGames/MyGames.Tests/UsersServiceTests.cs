@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
-using MyGames.Core.AppSettings;
-using MyGames.Core.Dtos;
+using MyGames.Core.Repositories;
 using MyGames.Core.Services;
 using MyGames.Core.Services.Interfaces;
+using MyGames.Database.Schemas;
 using NSubstitute;
 using Xunit;
 
@@ -15,20 +14,17 @@ namespace MyGames.Tests;
 public class UsersServiceTests
 {
     private readonly IUsersService _sut;
-    private readonly IOptions<MongoDbSettings> _dbOptions = Options.Create(new MongoDbSettings()); // = Substitute.For<IOptions<MongoDbSettings>>();
+    // private readonly IOptions<MongoDbSettings> _dbOptions = Options.Create(new MongoDbSettings()); // = Substitute.For<IOptions<MongoDbSettings>>();
+    private readonly IUserRepository _repository = Substitute.For<IUserRepository>();
     public UsersServiceTests()
     {
-        _dbOptions.Value.ConnectionString = "mongodb+srv://fakeuser:password@cluster0.pqof2.mongodb.net/database-fake";
-        _dbOptions.Value.DatabaseName = "database";
-        _dbOptions.Value.UsersCollectionName = "users";
-
-        _sut = new UsersService(_dbOptions);
+        _sut = new UsersService(_repository);
     }
 
     [Fact]
     public async Task GetUsers_ShouldReturnEmptyList_WhenNoUsersExist()
     {
-        _sut.GetUsers().Returns(new List<UserDto>()); // How to substitute the usersCollection in usersService???????
+        _repository.GetAllAsync().Returns(new List<User>());
         var result = await _sut.GetUsers();
 
         result.Should().BeEmpty();
@@ -37,8 +33,26 @@ public class UsersServiceTests
     }
 
     [Fact]
-    public void GetUsers_ShouldReturnListOfUsers_WhenUsersExist()
+    public async Task GetUsers_ShouldReturnListOfUsers_WhenUsersExist()
     {
-        
+        _repository.GetAllAsync().Returns(new List<User>
+        {
+            new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Username = "Mike",
+                Password = string.Empty,
+            },
+            new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Username = "Sophie",
+                Password = string.Empty,
+            }
+        });
+
+        var result = await _sut.GetUsers();
+
+        result.Should().HaveCount(2);
     }
 }

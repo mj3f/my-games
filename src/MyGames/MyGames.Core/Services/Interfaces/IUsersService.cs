@@ -6,8 +6,6 @@ public interface IUsersService
 {
     Task<List<UserDto>> GetUsers();
 
-    Task<UserDto?> GetById(string id);
-
     Task<UserDto?> GetByUsername(string username);
 
     Task AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd);
