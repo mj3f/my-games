@@ -1,7 +1,7 @@
 using MyGames.Core.Utils;
 using Xunit;
 
-namespace MyGames.Tests;
+namespace MyGames.Core.Tests.Unit.Utils;
 
 public class GuidGeneratorTests
 {

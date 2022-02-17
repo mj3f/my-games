@@ -18,9 +18,9 @@ public sealed class GamesService : IGamesService
 
     private readonly IGDBClient _client;
     
-    public GamesService(IOptions<TwitchLoginSettings> loginSettings)
+    public GamesService(IOptions<TwitchLoginSettings> loginSettings, IGDBClient? client = null) // second param a hack to allow unit testing.
     {
-        _client = CreateIGDBClient(loginSettings.Value.ClientId, loginSettings.Value.ClientSecret);
+        _client = client ?? CreateIGDBClient(loginSettings.Value.ClientId, loginSettings.Value.ClientSecret);
     }
 
     /// <summary>

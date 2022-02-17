@@ -9,7 +9,7 @@ using MyGames.Database.Schemas;
 using NSubstitute;
 using Xunit;
 
-namespace MyGames.Tests;
+namespace MyGames.Core.Tests.Unit.Services;
 
 public class UsersServiceTests
 {
