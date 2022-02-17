@@ -276,5 +276,7 @@ __pycache__/
 
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore
 appsettings.Development.json
+MyGames/src/MyGames.API/appsettings.Development.json
+MyGames/src/MyGames.Frontend/.next/*
 
 .next/*
