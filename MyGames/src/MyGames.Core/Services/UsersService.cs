@@ -57,12 +57,12 @@ public sealed class UsersService : IUsersService
     /// </summary>
     /// <param name="username"></param>
     /// <param name="gameToAdd"></param>
-    public async Task AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd)
+    public async Task<bool> AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd)
     {
         if (string.IsNullOrEmpty(username))
         {
             Logger.Error("[USERS SERVICE] No username provided when trying to add a game.");
-            return;
+            return false;
         }
         
         // Convert the igdb game to a Game (mongodb schema).
@@ -79,6 +79,7 @@ public sealed class UsersService : IUsersService
         try
         {
             await _repository.AddGameToUsersLibraryAsync(username, game);
+            return true;
         }
         catch (Exception ex)
         {
@@ -92,17 +93,18 @@ public sealed class UsersService : IUsersService
     /// </summary>
     /// <param name="username"></param>
     /// <param name="gameId"></param>
-    public async Task RemoveGameFromUsersLibrary(string username, string gameId)
+    public async Task<bool> RemoveGameFromUsersLibrary(string username, string gameId)
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(gameId))
         {
             Logger.Error("[USERS SERVICE] No username or game ID provided whilst trying to remove a game from users library.");
-            return;
+            return false;
         }
         
         try
         {
             await _repository.RemoveGameFromUsersLibraryAsync(username, gameId);
+            return true;
         }
         catch (Exception ex)
         {

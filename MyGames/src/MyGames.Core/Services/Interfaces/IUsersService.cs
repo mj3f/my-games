@@ -8,9 +8,9 @@ public interface IUsersService
 
     Task<UserDto?> GetByUsername(string username);
 
-    Task AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd);
+    Task<bool> AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd);
 
-    Task RemoveGameFromUsersLibrary(string username, string gameId);
+    Task<bool> RemoveGameFromUsersLibrary(string username, string gameId);
 
     Task UpdateGameInUsersLibrary(string username, GameDto game);
 }

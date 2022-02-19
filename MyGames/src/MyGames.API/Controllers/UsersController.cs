@@ -78,8 +78,14 @@ public sealed class UsersController : ControllerBase
     {
         try
         {
-            await _usersService.AddGameToUsersLibrary(username, game);
-            return Ok("game added to users library");
+            bool result = await _usersService.AddGameToUsersLibrary(username, game);
+
+            if (result)
+            {
+                return Ok("game added to users library");
+            }
+            
+            return BadRequest("Game could not be added, check username and game provided in request.");
         }
         catch (Exception ex)
         {
@@ -96,8 +102,11 @@ public sealed class UsersController : ControllerBase
     {
         try
         {
-            await _usersService.RemoveGameFromUsersLibrary(username, gameId);
-            return Ok("game removed from users library");
+            var result = await _usersService.RemoveGameFromUsersLibrary(username, gameId);
+            return result
+                ? Ok("game removed from users library")
+                : BadRequest("Could not remove game from library, check username and game id are provided" +
+                             "in the request");
         }
         catch (Exception ex)
         {
