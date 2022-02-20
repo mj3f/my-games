@@ -24,13 +24,14 @@ const UserHome: React.FC = () => { // TODO: types in props.
             setUser(appState.authState.currentUser);
         }
 
-        if (appState.updateGame) {
-            updateGame(appState.updateGame);
-            // dispatch({ type: 'UPDATE_GAME', payload: null}); // clear it from state.
+        if (user && appState.updateGame) {
+            updateGame(appState.updateGame)
+                .then(_ => dispatch({ type: 'UPDATE_GAME', payload: null})) // clear it from state.
         }
 
-        if (appState.gameIdToRemove) {
-            removeGameFromUsersLibrary(appState.gameIdToRemove);
+        if (user && appState.gameIdToRemove) {
+            removeGameFromUsersLibrary(appState.gameIdToRemove)
+                .then(_ => dispatch({ type: 'REMOVE_GAME', payload: null }));
         }
     },
     [appState]);
@@ -42,13 +43,23 @@ const UserHome: React.FC = () => { // TODO: types in props.
     const addGameToUsersLibrary = async (game: IgdbGame) => {
         // TODO: addGame should return the game, then we can add it to the users games.
         await usersService.addGameToUsersLibrary(user.username, game)
-            .then(res => console.log(res))
+            .then(res => {
+                user.games.push(res);
+                setShowAddGameModal(false);
+            })
             .catch(error => console.error(error));
     };
 
-    const removeGameFromUsersLibrary = async (id: string) => { // TODO: Test this works.
-        await usersService.removeGameFromUsersLibrary(user.username, id)
-            .then(res => console.log(res))
+    const removeGameFromUsersLibrary = async (gameId: string) => {
+        await usersService.removeGameFromUsersLibrary(user.username, gameId)
+            .then(_ => {
+                const userCopy = { ...user };
+                const gameToRemove = userCopy.games.find(g => g.id === appState.gameIdToRemove);
+                // @ts-ignore
+                const index = userCopy.games.indexOf(gameToRemove);
+                userCopy.games.splice(index, 1);
+                setUser(userCopy); // re-render games collection for user.
+            })
             .catch(error => console.error(error));
     };
 
@@ -58,14 +69,12 @@ const UserHome: React.FC = () => { // TODO: types in props.
             await usersService.updateGameInUsersLibrary(username, game)
                 .then(() => {
                     const updatedUser = { ...user };
-                    console.log('updated user games (before) = ', updatedUser.games);
                     const existingGame: Game | undefined =
                         updatedUser.games.find(g => g.id === game.id);
                     if (existingGame) {
                         existingGame.gameStatus = game.gameStatus;
                         existingGame.notes = game.notes;
                     }
-                    console.log('updated user games (after) = ', updatedUser.games);
                     setUser(updatedUser);
                 })
                 .catch(error => console.error(error));

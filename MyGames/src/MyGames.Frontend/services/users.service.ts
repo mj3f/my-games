@@ -11,18 +11,18 @@ export class UsersService extends BaseService {
             .then(res => res.data);
     }
 
-    public async addGameToUsersLibrary(username: string, game: IgdbGame): Promise<string> {
+    public async addGameToUsersLibrary(username: string, game: IgdbGame): Promise<Game> {
         return await axios.put(`${this.apiUrl}/users/${username}/add-game`, game)
             .then(res => res.data);
     }
 
     public async removeGameFromUsersLibrary(username: string, gameId: string): Promise<string> {
-        return await axios.put(`${this.apiUrl}/users/${username}/remove-game`, gameId)
+        return await axios.put(`${this.apiUrl}/users/${username}/remove-game?gameId=${gameId}`)
             .then(res => res.data);
     }
 
     public async updateGameInUsersLibrary(username: string, game: Game): Promise<string> {
         return await axios.put(`${this.apiUrl}/users/${username}/game`, game)
-        .then(res => res.data);
+            .then(res => res.data);
     }
 }

@@ -2,7 +2,7 @@ import { Game } from "../../../models/game/game.model";
 import Image from "next/image";
 import GameDetailButton from "./GameDetailButton";
 import AppContext from "../../../context/AppContext";
-import { useContext } from "react";
+import {useContext, useState} from "react";
 import { GameStatus } from "../../../models/game/game-status.enum";
 
 export interface GameDetailProps {
@@ -12,6 +12,7 @@ export interface GameDetailProps {
 
 const GameDetail: React.FC<GameDetailProps> = ({ game, onClose }) => {
     const [_, dispatch] = useContext(AppContext);
+    const [showYesNoButtons, setShowYesNoButtons] = useState(false);
     
     const updateGame = (status: string) => {
         dispatch({ type: 'UPDATE_GAME', payload: { ...game, gameStatus: status }});
@@ -19,8 +20,9 @@ const GameDetail: React.FC<GameDetailProps> = ({ game, onClose }) => {
     };
 
     const removeGameFromLibrary = () => {
-        console.log('fdfdfdfdfdfdffdfdfdf');
         dispatch({ type: 'REMOVE_GAME', payload: game.id });
+        setShowYesNoButtons(false);
+        onClose();
     };
 
     const image = game.coverArtUrl ? 
@@ -47,7 +49,14 @@ const GameDetail: React.FC<GameDetailProps> = ({ game, onClose }) => {
                         <GameDetailButton onClick={() => updateGame(GameStatus.InProgress)}>Start Progress</GameDetailButton>
                     </div>
                 </div>
-                <GameDetailButton onClick={removeGameFromLibrary} colorIsRed>Remove Game</GameDetailButton>
+                <div className="flex flex-row">
+                    {showYesNoButtons ?
+                        <div>
+                            <button className="w-fit p-2 rounded text-white bg-blue-500 hover:bg-blue-600" onClick={removeGameFromLibrary}>Confirm</button>
+                            <button className="w-fit p-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => setShowYesNoButtons(false)}>Cancel</button>
+                        </div>
+                        : <GameDetailButton onClick={() => setShowYesNoButtons(true)} colorIsRed>Remove Game</GameDetailButton>}
+                </div>
                 <p>Your notes about this game:</p>
                 {game.notes.map(note => <div>{note.content}</div>)}
             </div>
