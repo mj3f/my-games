@@ -78,11 +78,11 @@ public sealed class UsersController : ControllerBase
     {
         try
         {
-            bool result = await _usersService.AddGameToUsersLibrary(username, game);
+            GameDto? gameDto = await _usersService.AddGameToUsersLibrary(username, game);
 
-            if (result)
+            if (gameDto is not null)
             {
-                return Ok("game added to users library");
+                return Ok(gameDto);
             }
             
             return BadRequest("Game could not be added, check username and game provided in request.");

@@ -57,12 +57,12 @@ public sealed class UsersService : IUsersService
     /// </summary>
     /// <param name="username"></param>
     /// <param name="gameToAdd"></param>
-    public async Task<bool> AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd)
+    public async Task<GameDto?> AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd)
     {
         if (string.IsNullOrEmpty(username))
         {
             Logger.Error("[USERS SERVICE] No username provided when trying to add a game.");
-            return false;
+            return null;
         }
         
         // Convert the igdb game to a Game (mongodb schema).
@@ -79,7 +79,15 @@ public sealed class UsersService : IUsersService
         try
         {
             await _repository.AddGameToUsersLibraryAsync(username, game);
-            return true;
+            return new GameDto // This is ugly, is there a better way??
+            {
+                Id = game.Id,
+                IgdbId = game.IgdbId,
+                Name = game.Name,
+                CoverArtUrl = game.CoverArtUrl,
+                Notes = new List<GameNoteDto>(),
+                GameStatus = game.Status
+            };
         }
         catch (Exception ex)
         {

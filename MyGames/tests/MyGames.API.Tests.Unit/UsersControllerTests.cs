@@ -92,12 +92,12 @@ public class UsersControllerTests
 
         var username = Guid.NewGuid().ToString();
 
-        _usersService.AddGameToUsersLibrary(username, gameToAdd).Returns(true);
+        _usersService.AddGameToUsersLibrary(username, gameToAdd).Returns(new GameDto());
 
         var result = (OkObjectResult) await _sut.AddGameToUserLibraryAsync(username, gameToAdd);
 
         result.StatusCode.Should().Be(200);
-        result.Value.As<string>().Should().Be("game added to users library");
+        result.Value.As<GameDto>().Should().NotBe(null);
     }
     
     [Fact]
@@ -116,7 +116,7 @@ public class UsersControllerTests
     [Fact]
     public async Task AddGameToUserLibraryAsync_ShouldReturnFalse_WhenUsernameNotProvided()
     {
-        _usersService.AddGameToUsersLibrary(string.Empty, null).Returns(false);
+        _usersService.AddGameToUsersLibrary(string.Empty, null).ReturnsNull();
 
         var result = (BadRequestObjectResult) await _sut.AddGameToUserLibraryAsync(String.Empty, null);
 
