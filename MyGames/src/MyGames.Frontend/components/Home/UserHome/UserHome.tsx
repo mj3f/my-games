@@ -28,6 +28,10 @@ const UserHome: React.FC = () => { // TODO: types in props.
             updateGame(appState.updateGame);
             // dispatch({ type: 'UPDATE_GAME', payload: null}); // clear it from state.
         }
+
+        if (appState.gameIdToRemove) {
+            removeGameFromUsersLibrary(appState.gameIdToRemove);
+        }
     },
     [appState]);
 
@@ -38,6 +42,12 @@ const UserHome: React.FC = () => { // TODO: types in props.
     const addGameToUsersLibrary = async (game: IgdbGame) => {
         // TODO: addGame should return the game, then we can add it to the users games.
         await usersService.addGameToUsersLibrary(user.username, game)
+            .then(res => console.log(res))
+            .catch(error => console.error(error));
+    };
+
+    const removeGameFromUsersLibrary = async (id: string) => { // TODO: Test this works.
+        await usersService.removeGameFromUsersLibrary(user.username, id)
             .then(res => console.log(res))
             .catch(error => console.error(error));
     };

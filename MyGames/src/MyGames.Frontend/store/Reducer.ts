@@ -7,6 +7,7 @@ export type ReducerActionType =
     | 'LOG_IN'
     | 'LOG_OUT'
     | 'UPDATE_GAME'
+    | 'REMOVE_GAME'
 
 export interface ReducerAction {
     type: ReducerActionType;
@@ -23,7 +24,6 @@ const Reducer = (state: AppState, action: ReducerAction) => {
                 ...state,
                 authState: action.payload as AuthState
             };
-            cacheState(newState);
             return newState;
         case 'LOG_OUT':
             newState = { // AppState
@@ -34,7 +34,6 @@ const Reducer = (state: AppState, action: ReducerAction) => {
                     token: ''
                 }
             };
-            cacheState(newState);
             return newState;
         case 'UPDATE_GAME':
             newState = {
@@ -42,14 +41,15 @@ const Reducer = (state: AppState, action: ReducerAction) => {
                 updateGame: action.payload as Game
             }
             return newState;
+        case 'REMOVE_GAME':
+            newState = {
+                ...state,
+                gameIdToRemove: action.payload as string
+            };
+            return newState;
         default:
             return state;
     }
-};
-
-const cacheState = (state: AppState) => {
-    // const cacheService = new CacheService();
-    // cacheService.setCacheData('APP_STATE', JSON.stringify(state));
 };
 
 export default Reducer;

@@ -18,6 +18,11 @@ const GameDetail: React.FC<GameDetailProps> = ({ game, onClose }) => {
         onClose();
     };
 
+    const removeGameFromLibrary = () => {
+        console.log('fdfdfdfdfdfdffdfdfdf');
+        dispatch({ type: 'REMOVE_GAME', payload: game.id });
+    };
+
     const image = game.coverArtUrl ? 
         <Image
             className="rounded"
@@ -42,6 +47,7 @@ const GameDetail: React.FC<GameDetailProps> = ({ game, onClose }) => {
                         <GameDetailButton onClick={() => updateGame(GameStatus.InProgress)}>Start Progress</GameDetailButton>
                     </div>
                 </div>
+                <GameDetailButton onClick={removeGameFromLibrary} colorIsRed>Remove Game</GameDetailButton>
                 <p>Your notes about this game:</p>
                 {game.notes.map(note => <div>{note.content}</div>)}
             </div>
