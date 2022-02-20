@@ -1,11 +1,11 @@
 import axios from "axios";
 import { NextPage } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useContext, useState } from "react";
 import Button from "../components/Button/Button";
 import AppContext from "../context/AppContext";
 import { AuthState } from "../models/auth/auth-state.interface";
-import { User } from "../models/user/user.model";
 import { AuthService } from "../services/auth.service";
 import { UsersService } from "../services/users.service";
 
@@ -49,7 +49,10 @@ const SignIn: NextPage = () => {
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';
     
     return (
-        <div className="flex justify-center items-center h-screen w-full bg-gray-800">
+        <div className="flex flex-col justify-center items-center h-screen w-full bg-gray-800">
+            <div className="text-white text-2xl font-semibold p-2 flex w-1/2">
+                <Link href="/">Go back</Link>
+            </div>
             <div id="form-container" className="flex flex-col justify-start rounded w-1/2 bg-gray-200">
                 <h2 className="text-2xl font-semibold pt-4 flex justify-center">Sign In</h2>
                 <form className="flex flex-col h-full px-4" onSubmit={handleSubmit}>
