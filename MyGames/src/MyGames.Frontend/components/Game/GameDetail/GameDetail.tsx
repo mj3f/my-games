@@ -49,16 +49,14 @@ const GameDetail: React.FC<GameDetailProps> = ({ game, onClose }) => {
                         <GameDetailButton onClick={() => updateGame(GameStatus.InProgress)}>Start Progress</GameDetailButton>
                     </div>
                 </div>
-                <div className="flex flex-row">
+                <div className="flex flex-row justify-end pt-2">
                     {showYesNoButtons ?
                         <div>
                             <button className="w-fit p-2 rounded text-white bg-blue-500 hover:bg-blue-600" onClick={removeGameFromLibrary}>Confirm</button>
                             <button className="w-fit p-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => setShowYesNoButtons(false)}>Cancel</button>
                         </div>
-                        : <GameDetailButton onClick={() => setShowYesNoButtons(true)} colorIsRed>Remove Game</GameDetailButton>}
+                        : <GameDetailButton onClick={() => setShowYesNoButtons(true)} colorIsRed>Remove Game from Library</GameDetailButton>}
                 </div>
-                <p>Your notes about this game:</p>
-                {game.notes.map(note => <div>{note.content}</div>)}
             </div>
         </div>
     );

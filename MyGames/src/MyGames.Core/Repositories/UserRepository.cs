@@ -49,12 +49,6 @@ public class UserRepository : IUserRepository
             .First(u => u.Username == username);
 
         Game existingGame = user.Games.First(g => g.Id == game.Id);
-        existingGame.Notes = game.Notes.Select(note => new GameNote
-        {
-            Content = note.Content,
-            CreatedAt = note.CreatedAt,
-            Id = note.Id
-        }).ToList();
         existingGame.Status = game.Status;
 
         var filter = Builders<User>.Filter.Eq(u => u.Username, username);

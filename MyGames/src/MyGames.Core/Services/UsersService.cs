@@ -72,7 +72,6 @@ public sealed class UsersService : IUsersService
             IgdbId = gameToAdd.Id,
             Name = gameToAdd.Name,
             CoverArtUrl = gameToAdd.CoverArtUrl,
-            Notes = new List<GameNote>(),
             Status = GameStatus.Backlog
         };
 
@@ -135,12 +134,6 @@ public sealed class UsersService : IUsersService
             IgdbId = game.IgdbId,
             Name = game.Name,
             CoverArtUrl = game.CoverArtUrl,
-            Notes = game.Notes.Select(n => new GameNote
-            {
-                Content = n.Content,
-                CreatedAt = n.CreatedAt,
-                Id = n.Id
-            }).ToList(),
             Status = game.GameStatus
         };
 
@@ -171,12 +164,6 @@ public sealed class UsersService : IUsersService
             GameStatus = g.Status,
             IgdbId = g.IgdbId,
             CoverArtUrl = g.CoverArtUrl,
-            Notes = g.Notes.Select(n => new GameNoteDto
-            {
-                Id = n.Id!,
-                Content = n.Content,
-                CreatedAt = n.CreatedAt
-            }).ToList()
         }).ToList()
     };
 }

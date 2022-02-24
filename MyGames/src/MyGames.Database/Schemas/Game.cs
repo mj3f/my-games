@@ -21,7 +21,4 @@ public class Game
     
     [BsonElement("status")]
     public string Status { get; set; }
-    
-    [BsonElement("notes")]
-    public ICollection<GameNote> Notes { get; set; }
 }
