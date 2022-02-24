@@ -6,7 +6,7 @@ public interface IUserRepository
 {
     Task<List<User>> GetAllAsync();
 
-    Task<User?> GetByIdAsync(string id);
+    Task<User?> GetByIdAsync(string username);
 
     Task AddGameToUsersLibraryAsync(string username, Game game);
     
@@ -14,5 +14,5 @@ public interface IUserRepository
     
     Task UpdateGameInUsersLibraryAsync(string username, Game game);
 
-    // Task CreateAsync(T obj);
+    Task CreateAsync(string username, string password, string salt);
 }

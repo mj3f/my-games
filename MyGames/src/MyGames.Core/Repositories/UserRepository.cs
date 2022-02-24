@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MyGames.Core.AppSettings;
+using MyGames.Core.Utils;
 using MyGames.Database.Schemas;
 
 namespace MyGames.Core.Repositories;
@@ -53,5 +54,19 @@ public class UserRepository : IUserRepository
 
         var filter = Builders<User>.Filter.Eq(u => u.Username, username);
         await _usersCollection.ReplaceOneAsync(filter, user);
+    }
+
+    public async Task CreateAsync(string username, string password, string salt)
+    {
+        var user = new User
+        {
+            Username = username,
+            Password = password,
+            Salt = salt,
+            Id = GuidGenerator.GenerateGuidForMongoDb(),
+            Games = new List<Game>()
+        };
+        
+        await _usersCollection.InsertOneAsync(user);
     }
 }

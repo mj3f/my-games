@@ -87,8 +87,7 @@ const DefaultHome: React.FC = () => {
             <Particles id="tsparticles" options={particleOptions} />
             <div className="z-10 text-green-500">
                 <h1 className="text-4xl font-semibold text-center">Your Games, Your Time</h1>
-                <p className="text-2xl text-center">Keep track of your library, what you&apos;re currently playing,
-                    where you&apos;re up to, and your backlog.</p>
+                <p className="text-2xl text-center">Keep track of your games library, past, present and future.</p>
                 <div className="flex justify-center pt-2">
                     <div>
                         <Button onClick={() => goToPage('/about')}>Learn more</Button>

@@ -28,10 +28,10 @@ const About: NextPage = () => {
           <a href="https://igdb.com/" className="text-green-500 hover:underline">Click here to go to the IGDB website!</a>
         </div>
         <div className="flex justify-center items-center pt-20">
-          <h2 className="text-2xl">Ready to start?</h2>
+          <h2 className="text-2xl">Ready to start? (Sorry! we're not quite there yet!)</h2>
         </div>
         <div className="flex justify-center items-center pt-2">
-          <Button onClick={() => router.push('/sign-up')}>Sign Up</Button>
+          <Button onClick={() => router.push('/sign-up')} disabled>Sign Up</Button>
         </div>
       </div>
     </Layout>
