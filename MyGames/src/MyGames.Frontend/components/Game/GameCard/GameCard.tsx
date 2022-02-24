@@ -17,7 +17,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
     return (
         <>
-            <div className="flex flex-col h-60 w-60 rounded bg-gray-700 mx-2 mt-4 hover:cursor-pointer"
+            <div className="flex flex-col h-60 md:w-60 w-full rounded bg-gray-700 mx-2 mt-4 hover:cursor-pointer"
                  onClick={() => setShowModal(true)}>
                 <div className="h-40 w-full rounded relative">
                     {image}
