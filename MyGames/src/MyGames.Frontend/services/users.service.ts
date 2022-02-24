@@ -6,8 +6,8 @@ import { Game } from "../models/game/game.model";
 
 export class UsersService extends BaseService {
 
-    public async getUser(): Promise<User> {
-        return await axios.get(`${this.apiUrl}/users/dummy`)
+    public async getUser(username: string): Promise<User> {
+        return await axios.get(`${this.apiUrl}/users/${username}`)
             .then(res => res.data);
     }
 

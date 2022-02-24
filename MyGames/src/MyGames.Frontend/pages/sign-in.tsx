@@ -22,13 +22,13 @@ const SignIn: NextPage = () => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // prevent page refresh.
         await authService.login(username, password)
-            .then(res => getUser())
+            .then(res => getUser(username))
             .catch(error => setErrorMsg(error.response.data));
     };
 
     // TODO: can this be done in the home component get props function?
-    const getUser = async () => {
-        await usersService.getUser()
+    const getUser = async (username: string) => {
+        await usersService.getUser(username)
             .then(user => {
                 const authState: AuthState = {
                     isAuthenticated: true,
