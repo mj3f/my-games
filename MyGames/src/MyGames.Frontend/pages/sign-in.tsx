@@ -13,6 +13,7 @@ const SignIn: NextPage = () => {
     const [username, setUsername] = useState(''); // not ideal after each keystroke, refactor this.
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const [showSpinner, setShowSpinner] = useState(false);
 
     const [_, dispatch] = useContext(AppContext);
     const router = useRouter();
@@ -20,10 +21,17 @@ const SignIn: NextPage = () => {
     const usersService = new UsersService();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        setShowSpinner(true);
         e.preventDefault(); // prevent page refresh.
         await authService.login(username, password)
-            .then(res => getUser(username))
-            .catch(error => setErrorMsg(error.response.data));
+            .then(res => {
+                getUser(username);
+                setShowSpinner(false);
+            })
+            .catch(error => {
+                setErrorMsg(error.response.data);
+                setShowSpinner(false);
+            });
     };
 
     // TODO: can this be done in the home component get props function?
@@ -47,13 +55,11 @@ const SignIn: NextPage = () => {
     const clearErrorMsg = () => errorMsg.length === 0 ?? setErrorMsg('');
     
     const formClass = 'rounded h-8 mt-1 pl-1 focus:outline-none focus:ring focus:ring-green-500';
-    
-    return (
-        <div className="flex flex-col justify-center items-center h-screen w-full bg-gray-800">
-            <div className="text-white text-2xl font-semibold p-2 flex w-1/2">
-                <Link href="/">Go back</Link>
-            </div>
-            <div id="form-container" className="flex flex-col justify-start rounded w-1/2 bg-gray-200">
+
+    const containerContent = showSpinner ?
+        <div className="h-full w-full flex items-center justify-center">Signing in....</div> :
+        (
+            <>
                 <h2 className="text-2xl font-semibold pt-4 flex justify-center">Sign In</h2>
                 <form className="flex flex-col h-full px-4" onSubmit={handleSubmit}>
                     <div className="flex flex-col py-4">
@@ -73,12 +79,22 @@ const SignIn: NextPage = () => {
                             onChange={(e) => { setPassword(e.target.value); clearErrorMsg() }} />
                     </div>
                     <div className="flex flex-col pb-4">
-                        <p className="mb-2 text-center text-red-600">{errorMsg}</p>
                         <Button
                             disabled={username.length === 0 || password.length === 0}
                             type="submit">Sign In</Button>
+                        <p className="mb-2 text-center text-red-600">{errorMsg}</p>
                     </div>
                 </form>
+            </>
+        );
+    
+    return (
+        <div className="flex flex-col justify-center items-center h-screen w-full bg-gray-800">
+            <div className="text-white text-2xl font-semibold p-2 flex w-1/2">
+                <Link href="/">Go back</Link>
+            </div>
+            <div id="form-container" className="flex flex-col justify-start rounded w-1/2 h-72 bg-gray-200">
+                {containerContent}
             </div>
         </div>
     );

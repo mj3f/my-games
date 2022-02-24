@@ -73,7 +73,6 @@ const UserHome: React.FC = () => { // TODO: types in props.
                         updatedUser.games.find(g => g.id === game.id);
                     if (existingGame) {
                         existingGame.gameStatus = game.gameStatus;
-                        existingGame.notes = game.notes;
                     }
                     setUser(updatedUser);
                 })
