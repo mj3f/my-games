@@ -10,7 +10,8 @@ export const InitialAppContextState: AppState = {
         currentUser: undefined,
         token: ''
     } as AuthState,
-    updateGame: undefined
+    updateGame: undefined,
+    gameIdToRemove: ''
 };
 
 const AppContext =
