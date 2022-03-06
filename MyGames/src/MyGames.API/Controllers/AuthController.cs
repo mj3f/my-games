@@ -25,11 +25,12 @@ public sealed class AuthController : ControllerBase
             return BadRequest("Username and password required. Check your inputs and try again.");
         }
 
-        bool credentialsValid = await _authService.LoginAsync(loginCreds.Username, loginCreds.Password);
+        bool credentialsValid = await _authService.VerifyCredentialsAsync(loginCreds.Username, loginCreds.Password);
 
         if (credentialsValid)
         {
-            return Ok("jwt token");
+            string token = await _authService.LoginAsync(loginCreds.Username);
+            return Ok(token);
         }
 
         return BadRequest("username or password is invaild.");

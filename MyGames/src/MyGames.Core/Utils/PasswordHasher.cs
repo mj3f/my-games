@@ -13,11 +13,7 @@ public static class PasswordHasher
     {
         // generate a 128-bit salt using a cryptographically strong random sequence of nonzero values
         // See: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/consumer-apis/password-hashing?view=aspnetcore-6.0
-        byte[] salt = new byte[SaltSize];
-        using (var rngCsp = new RNGCryptoServiceProvider())
-        {
-            rngCsp.GetNonZeroBytes(salt);
-        }
+        byte[] salt = GetSalt();
         
         // Produce a version 2 (see comment above) text hash.
 
@@ -50,4 +46,6 @@ public static class PasswordHasher
 
         return CryptographicOperations.FixedTimeEquals(actualSubkey, expectedSubkey);
     }
+
+    private static byte[] GetSalt() => RandomNumberGenerator.GetBytes(SaltSize);
 }

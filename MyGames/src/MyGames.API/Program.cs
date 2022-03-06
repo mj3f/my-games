@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MyGames.Core.AppSettings;
 using MyGames.Core.Repositories;
 using MyGames.Core.Services;
 using MyGames.Core.Services.Interfaces;
-using MyGames.Database.Schemas;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,16 +25,35 @@ builder.Services.AddSwaggerGen();
 // Map appSettings kvp to C# classes.
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDB"));
 builder.Services.Configure<TwitchLoginSettings>(builder.Configuration.GetSection("TwitchLogin"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Register services
 builder.Services.AddMemoryCache();
 builder.Services.AddCors();
+
+JwtSettings jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Convert.FromBase64String(jwtSettings.SecretKey))
+    };
+});
+builder.Services.AddAuthorization();
 
 // - Singletons
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IGamesService, GamesService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 var app = builder.Build();
 
@@ -56,6 +76,9 @@ try
         .WithOrigins("http://localhost:3000")
         .AllowCredentials());
 
+    app.UseStaticFiles();
+
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.UseSerilogRequestLogging();
