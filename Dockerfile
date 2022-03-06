@@ -11,8 +11,6 @@ RUN dotnet test --no-build --verbosity normal MyGames/tests/MyGames.Core.Tests.U
 
 RUN dotnet publish -r linux-x64 --no-restore -c Release -o ./dist/release --self-contained MyGames/src/MyGames.API/MyGames.API.csproj
 
-RUN ls -l
-
 FROM node:17-alpine as build-webapp
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
@@ -30,7 +28,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 COPY --from=build-dotnet /app/dist/release .
 COPY --from=build-webapp /app/.next ./wwwroot/
-
-RUN ls -l
 
 ENTRYPOINT [ "./MyGames.API" ]
