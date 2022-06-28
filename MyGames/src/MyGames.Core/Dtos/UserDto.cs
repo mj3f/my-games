@@ -1,6 +1,6 @@
 namespace MyGames.Core.Dtos;
 
-public record UserDto
+public sealed record UserDto
 {
     /// <summary>
     /// Unique identifier.

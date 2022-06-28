@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using MyGames.Core.AppSettings;
 using MyGames.Core.Utils;
 using MyGames.Database.Schemas;
 
@@ -8,52 +5,85 @@ namespace MyGames.Core.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly IMongoCollection<User> _usersCollection;
+    private readonly IDbRepository<User> _dbRepository;
     
-    // dbSettings values populated from the appSettings.json file in the myGames.API project.
-    public UserRepository(IOptions<MongoDbSettings> dbSettings)
+    public UserRepository(IDbRepository<User> dbRepository)
     {
-        var mongoClient = new MongoClient(
-            dbSettings.Value.ConnectionString);
-
-        IMongoDatabase mongoDatabase = mongoClient.GetDatabase(
-            dbSettings.Value.DatabaseName);
-
-        _usersCollection = mongoDatabase.GetCollection<User>(
-            dbSettings.Value.UsersCollectionName);
+        _dbRepository = dbRepository;
     }
-    
-    public async Task<List<User>> GetAllAsync() => await _usersCollection.Find(_ => true).ToListAsync() ?? new List<User>();
 
-    public async Task<User?> GetByIdAsync(string id) => await _usersCollection.Find(u => u.Username == id).FirstOrDefaultAsync();
+    public async Task<List<User>> GetAllAsync() => await _dbRepository.GetAllAsync();
+
+    public async Task<User?> GetByIdAsync(string id) => await _dbRepository.GetByIdAsync(id);
 
     public async Task AddGameToUsersLibraryAsync(string username, Game game)
     {
-        await _usersCollection.FindOneAndUpdateAsync(
-            u => u.Username == username, // TODO: How to handle case where username does not match a user in the db?
-            Builders<User>.Update.AddToSet(u => u.Games, game));
+        User? user = await _dbRepository.GetByIdAsync(username);
+        if (user is null)
+        {
+            return;
+        }
+        
+        user.Games!.Add(game);
+        await _dbRepository.UpdateAsync(username, user);
+        
+        // TODO: Does the above work the same as this?
+        // await _usersCollection.FindOneAndUpdateAsync(
+        //     u => u.Username == username,
+        //     Builders<User>.Update.AddToSet(u => u.Games, game));
+        
     }
 
     public async Task RemoveGameFromUsersLibraryAsync(string username, string gameId)
     {
-        // https://stackoverflow.com/a/30145663
-        var update = Builders<User>.Update.PullFilter(u => u.Games,
-            g => g.Id == gameId);
+        User? user = await GetByIdAsync(username);
+
+        if (user is null)
+        {
+            return;
+        }
+
+        Game? gameToRemove = user.Games!.FirstOrDefault(g => g.Id == gameId);
+
+        if (gameToRemove is null)
+        {
+            return;
+        }
+
+        user.Games!.Remove(gameToRemove);
         
-        await _usersCollection.FindOneAndUpdateAsync(u => u.Username == username, update);
+        await _dbRepository.UpdateAsync(username, user);
+
+        // TODO: Does the above work the same as this?
+        // https://stackoverflow.com/a/30145663
+        // var update = Builders<User>.Update.PullFilter(u => u.Games,
+        //     g => g.Id == gameId);
+        //
+        // await _usersCollection.FindOneAndUpdateAsync(u => u.Username == username, update);
     }
 
     public async Task UpdateGameInUsersLibraryAsync(string username, Game game)
     {
-        User user = _usersCollection
-            .AsQueryable()
-            .First(u => u.Username == username);
+        User? user = await GetByIdAsync(username);
 
-        Game existingGame = user.Games.First(g => g.Id == game.Id);
+        if (user is null)
+        {
+            return;
+        }
+
+        Game? existingGame = user.Games!.FirstOrDefault(g => g.Id == game.Id);
+        if (existingGame is null)
+        {
+            return;
+        }
+
         existingGame.Status = game.Status;
 
-        var filter = Builders<User>.Filter.Eq(u => u.Username, username);
-        await _usersCollection.ReplaceOneAsync(filter, user);
+        await _dbRepository.UpdateAsync(username, user);
+
+        // TODO: Does the above work the same as this?
+        // var filter = Builders<User>.Filter.Eq(u => u.Username, username);
+        // await _usersCollection.ReplaceOneAsync(filter, user);
     }
 
     public async Task CreateAsync(string username, string password, string salt)
@@ -66,7 +96,9 @@ public class UserRepository : IUserRepository
             Id = GuidGenerator.GenerateGuidForMongoDb(),
             Games = new List<Game>()
         };
+
+        await _dbRepository.CreateAsync(user);
         
-        await _usersCollection.InsertOneAsync(user);
+        // await _usersCollection.InsertOneAsync(user);
     }
 }

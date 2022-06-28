@@ -4,6 +4,7 @@ using MyGames.Core.AppSettings;
 using MyGames.Core.Repositories;
 using MyGames.Core.Services;
 using MyGames.Core.Services.Interfaces;
+using MyGames.Database.Schemas;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +55,9 @@ builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IGamesService, GamesService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+// Transient
+builder.Services.AddTransient<IDbRepository<User>, MongoDbRepository<User>>();
 
 var app = builder.Build();
 
