@@ -14,7 +14,7 @@ public sealed record IgdbGameDto
     /// <summary>
     /// The name of the game.
     /// </summary>
-    public string Name { get; init; }
+    public string Name { get; init; } = default!;
     
     /// <summary>
     /// Id of games cover art.

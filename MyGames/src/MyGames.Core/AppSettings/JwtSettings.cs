@@ -1,5 +1,8 @@
 namespace MyGames.Core.AppSettings;
 
+/// <summary>
+/// Mapping of jwt settings, found in appsettings.json.
+/// </summary>
 public sealed class JwtSettings
 {
     public string Audience { get; set; } = null!;

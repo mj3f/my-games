@@ -57,6 +57,7 @@ public sealed class UsersService : IUsersService
     /// </summary>
     /// <param name="username"></param>
     /// <param name="gameToAdd"></param>
+    /// <exception cref="Exception">Throws an exception if the game could not be added to the db.</exception>
     public async Task<GameDto?> AddGameToUsersLibrary(string username, IgdbGameDto gameToAdd)
     {
         if (string.IsNullOrEmpty(username))
@@ -100,6 +101,7 @@ public sealed class UsersService : IUsersService
     /// </summary>
     /// <param name="username"></param>
     /// <param name="gameId"></param>
+    /// <exception cref="Exception">Throws an exception if the game could not be removed from the db.</exception>
     public async Task<bool> RemoveGameFromUsersLibrary(string username, string gameId)
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(gameId))
@@ -120,11 +122,17 @@ public sealed class UsersService : IUsersService
         }
     }
 
+    /// <summary>
+    /// Updates a game in the user library, i.e. changing its status in the library.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="game"></param>
+    /// <exception cref="Exception">Throws an exception if the game could not be updated in the db.</exception>
     public async Task UpdateGameInUsersLibrary(string username, GameDto game)
     {
-        if (string.IsNullOrEmpty(username) || game is null)
+        if (string.IsNullOrEmpty(username))
         {
-            Logger.Error("[USERS SERVICE] No username or game object provided whilst trying to update game.");
+            Logger.Error("[USERS SERVICE] No username provided whilst trying to update game.");
             return;
         }
         

@@ -1,10 +1,11 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MyGames.Database.Interfaces;
 
 namespace MyGames.Database.Schemas;
 
 [BsonIgnoreExtraElements]
-public class User
+public class User : IKeyedObject
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -21,5 +22,7 @@ public class User
 
     [BsonElement("games")] public ICollection<Game>? Games { get; set; }
 
+    // Necessary for IDbRepository.
+    public string Key => Username;
 
 }

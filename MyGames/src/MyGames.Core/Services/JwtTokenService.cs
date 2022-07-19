@@ -17,7 +17,7 @@ public sealed class JwtTokenService : IJwtTokenService
         _jwtSettings = options.Value;
     }
 
-    public async Task<string> GenerateToken(string userId)
+    public Task<string> GenerateToken(string userId)
     {
         var key = Convert.FromBase64String(_jwtSettings.SecretKey);
 
@@ -40,21 +40,20 @@ public sealed class JwtTokenService : IJwtTokenService
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-
-        string jwtToken = await Task.Run(() => tokenHandler.WriteToken(securityToken));
-        return jwtToken;
+        
+        return Task.FromResult(tokenHandler.WriteToken(securityToken));
     }
 
-    public async Task<string> GenerateRefreshToken()
+    public Task<string> GenerateRefreshToken()
     {
         var randomBytes = new byte[32];
 
         using var randomNumberGenerator = RandomNumberGenerator.Create(); // non static instance.
 
-        await Task.Run(() => randomNumberGenerator.GetBytes(randomBytes));
+        randomNumberGenerator.GetBytes(randomBytes);
 
         string refreshToken = Convert.ToBase64String(randomBytes);
 
-        return refreshToken;
+        return Task.FromResult(refreshToken);
     }
 }
