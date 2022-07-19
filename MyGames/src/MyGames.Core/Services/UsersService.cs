@@ -130,9 +130,9 @@ public sealed class UsersService : IUsersService
     /// <exception cref="Exception">Throws an exception if the game could not be updated in the db.</exception>
     public async Task UpdateGameInUsersLibrary(string username, GameDto game)
     {
-        if (string.IsNullOrEmpty(username) || game is null)
+        if (string.IsNullOrEmpty(username))
         {
-            Logger.Error("[USERS SERVICE] No username or game object provided whilst trying to update game.");
+            Logger.Error("[USERS SERVICE] No username provided whilst trying to update game.");
             return;
         }
         

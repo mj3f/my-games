@@ -49,15 +49,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 builder.Services.AddAuthorization();
 
-// - Singletons
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IDbRepository<User>, MongoDbRepository<User>>();
+
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IGamesService, GamesService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
-// Transient
-builder.Services.AddTransient<IDbRepository<User>, MongoDbRepository<User>>();
 
 var app = builder.Build();
 
